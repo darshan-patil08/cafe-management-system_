@@ -77,8 +77,8 @@ const MenuManagement = () => {
   };
 
   return (
-    <Container>
-      <div className="admin-header">
+    <Container data-aos="fade-in" data-aos-duration="600">
+      <div className="admin-header" data-aos="fade-up">
         <h2>Menu Management</h2>
         <Button 
           variant="primary" 
@@ -89,7 +89,7 @@ const MenuManagement = () => {
       </div>
 
       {showForm && (
-        <Card>
+        <Card className="dashboard-card" data-aos="zoom-in" data-aos-delay="100">
           <h3>{editingItem ? 'Edit Item' : 'Add New Item'}</h3>
           <form onSubmit={handleSubmit}>
             <FormGroup>
@@ -146,9 +146,9 @@ const MenuManagement = () => {
         </Card>
       )}
 
-      <div className="menu-items-list">
-        {menuItems.map(item => (
-          <Card key={item._id}>
+      <div className="menu-items-list" data-aos="fade-up" data-aos-delay="150">
+        {menuItems.map((item, idx) => (
+          <Card key={item._id} className="dashboard-card" data-aos="zoom-in" data-aos-delay={(idx % 6) * 75}>
             <div className="item-row">
               <div className="item-info">
                 <h4>{item.name}</h4>

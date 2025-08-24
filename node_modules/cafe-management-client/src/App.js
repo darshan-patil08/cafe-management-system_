@@ -1,39 +1,47 @@
-import React, { useState, useEffect, useContext, createContext } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import './App.css';
+import HomePage from './components/HomePage';
+import MenuPage from './components/MenuPage';
+import AboutPage from './components/AboutPage';
+import ContactPage from './components/ContactPage';
+import Popup from './components/Popup';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import './App.css';
+import SiteLogo from './logo.svg';
+import { formatINR } from './utils/currency';
 
-// Import your component pages
-import HomePage from './components/HomePage';
-import AboutPage from './components/AboutPage';
-import MenuPage from './components/MenuPage';
-import ContactPage from './components/ContactPage';
-
-// Global Context (remove the duplicate import)
 const AppContext = createContext();
 const CartContext = createContext();
 
 // Cart Provider
 const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+
+  // Use a stable key for identity: prefer _id, then id; ignore undefined keys
+  const getItemKey = (obj) => (obj && (obj._id ?? obj.id)) ?? null;
   
   const addToCart = (item) => {
     setCartItems(prev => {
-      const existingItem = prev.find(cartItem => cartItem._id === item._id || cartItem.id === item.id);
+      const key = getItemKey(item);
+      const existingItem = prev.find(ci => {
+        const ciKey = getItemKey(ci);
+        return ciKey !== null && key !== null && ciKey === key;
+      });
       if (existingItem) {
-        return prev.map(cartItem =>
-          (cartItem._id === item._id || cartItem.id === item.id)
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
+        return prev.map(ci => {
+          const ciKey = getItemKey(ci);
+          return (ciKey !== null && key !== null && ciKey === key)
+            ? { ...ci, quantity: ci.quantity + 1 }
+            : ci;
+        });
       }
       return [...prev, { ...item, quantity: 1 }];
     });
   };
   
   const removeFromCart = (itemId) => {
-    setCartItems(prev => prev.filter(item => item._id !== itemId && item.id !== itemId));
+    setCartItems(prev => prev.filter(item => getItemKey(item) !== itemId));
   };
   
   const updateQuantity = (itemId, quantity) => {
@@ -42,9 +50,7 @@ const CartProvider = ({ children }) => {
       return;
     }
     setCartItems(prev =>
-      prev.map(item =>
-        (item._id === itemId || item.id === itemId) ? { ...item, quantity } : item
-      )
+      prev.map(item => (getItemKey(item) === itemId) ? { ...item, quantity } : item)
     );
   };
   
@@ -69,7 +75,7 @@ const CartProvider = ({ children }) => {
 };
 
 const useCart = () => useContext(CartContext);
-
+ 
 // Authentication View
 const AuthView = () => {
   const { setUser, setCurrentView } = useContext(AppContext);
@@ -78,11 +84,28 @@ const AuthView = () => {
   const [messageType, setMessageType] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+ 
+  // Basic email format validation for signup
+  const validateEmail = (email) => {
+    // Simple RFC5322-like regex for common cases
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    return re.test(String(email).trim());
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+    
+    // Client-side validation for signup email format
+    if (!isLogin) {
+      if (!validateEmail(formData.email)) {
+        setMessage('please enter email in proper manner');
+        setMessageType('error');
+        setLoading(false);
+        return;
+      }
+    }
     
     try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
@@ -185,16 +208,25 @@ const AuthView = () => {
 
 // Admin Layout with Navigation
 const AdminLayout = () => {
-  const { user, currentView, setCurrentView, logout } = useContext(AppContext);
+  const { user, currentView, setCurrentView, logout, theme, toggleTheme } = useContext(AppContext);
 
   return (
     <div className="admin-layout">
       <header className="main-header">
         <div className="header-content">
           <div className="logo">
-            <h1>☕ CafeDeluxe Admin</h1>
+            <img src={SiteLogo} alt="CafeDeluxe" className="site-logo" />
+            <span className="brand-text">CafeDeluxe Admin</span>
           </div>
           <div className="user-info">
+            <button 
+              className="theme-toggle"
+              aria-label="Toggle theme"
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
             <span>Welcome, {user.username}</span>
             <button onClick={logout} className="logout-btn">Logout</button>
           </div>
@@ -256,18 +288,29 @@ const AdminLayout = () => {
 
 // Customer Layout with Navigation
 const CustomerLayout = () => {
-  const { user, currentView, setCurrentView, logout } = useContext(AppContext);
+  const { user, currentView, setCurrentView, logout, theme, toggleTheme } = useContext(AppContext);
   const { getCartCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const navigateToSection = (sectionId) => {
+    if (currentView === 'customer-home') {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      setCurrentView('customer-home');
+      // Wait for HomePage to render, then scroll
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
+    }
+  };
+
   useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      easing: 'ease-in-out',
-      once: true,
-      mirror: false
-    });
-  }, []);
+    if (user && currentView && currentView !== 'auth') {
+      try { localStorage.setItem('last_view', currentView); } catch {}
+    }
+  }, [user, currentView]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -279,11 +322,12 @@ const CustomerLayout = () => {
 
   return (
     <div className="customer-layout">
+
       {/* Enhanced Navigation */}
       <nav className={`modern-nav ${isScrolled ? 'scrolled' : ''}`}>
         <div className="nav-container">
           <div className="nav-brand">
-            <h1>☕ CafeDeluxe</h1>
+            <img src={SiteLogo} alt="CafeDeluxe" className="site-logo" />
           </div>
           
           <div className="nav-links">
@@ -294,20 +338,20 @@ const CustomerLayout = () => {
               Home
             </button>
             <button 
-              className={currentView === 'customer-about' ? 'nav-link active' : 'nav-link'}
-              onClick={() => setCurrentView('customer-about')}
+              className={'nav-link'}
+              onClick={() => navigateToSection('about')}
             >
               About
             </button>
             <button 
-              className={currentView === 'customer-menu' ? 'nav-link active' : 'nav-link'}
-              onClick={() => setCurrentView('customer-menu')}
+              className={'nav-link'}
+              onClick={() => navigateToSection('menu')}
             >
               Menu
             </button>
             <button 
-              className={currentView === 'customer-contact' ? 'nav-link active' : 'nav-link'}
-              onClick={() => setCurrentView('customer-contact')}
+              className={'nav-link'}
+              onClick={() => navigateToSection('contact')}
             >
               Contact
             </button>
@@ -320,6 +364,14 @@ const CustomerLayout = () => {
           </div>
           
           <div className="nav-user">
+            <button 
+              className="theme-toggle"
+              aria-label="Toggle theme"
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
             <span>Hi, {user.username}</span>
             <button onClick={logout} className="logout-btn">Logout</button>
           </div>
@@ -394,7 +446,7 @@ const CustomerCart = () => {
             <img src={item.image} alt={item.name} />
             <div className="item-details">
               <h4>{item.name}</h4>
-              <p>${item.price.toFixed(2)} each</p>
+              <p>{formatINR(item.price)} each</p>
             </div>
             <div className="quantity-controls">
               <button onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)}>-</button>
@@ -402,7 +454,7 @@ const CustomerCart = () => {
               <button onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)}>+</button>
             </div>
             <div className="item-total">
-              ${(item.price * item.quantity).toFixed(2)}
+              {formatINR(item.price * item.quantity)}
             </div>
             <button 
               className="remove-btn"
@@ -416,7 +468,7 @@ const CustomerCart = () => {
 
       <div className="cart-summary">
         <div className="total">
-          <strong>Total: ${getCartTotal().toFixed(2)}</strong>
+          <strong>Total: {formatINR(getCartTotal())}</strong>
         </div>
         <button className="checkout-btn">Proceed to Checkout</button>
       </div>
@@ -479,7 +531,7 @@ const CustomerOrders = () => {
                 <p>{order.items.join(', ')}</p>
               </div>
               <div className="order-footer">
-                <span className="order-total">Total: ${order.total}</span>
+                <span className="order-total">Total: {formatINR(order.total)}</span>
                 <button className="reorder-btn">Reorder</button>
               </div>
             </div>
@@ -595,10 +647,15 @@ const AdminDashboard = () => {
       <div className="quick-actions">
         <h3>⚡ Quick Actions</h3>
         <div className="action-buttons">
-          <button className="action-btn primary">📝 Add Menu Item</button>
-          <button className="action-btn success">👁 View Orders</button>
-          <button className="action-btn info">📊 Generate Report</button>
-          <button className="action-btn warning">👥 Manage Users</button>
+          {/* Use AppContext to navigate to key admin subpages */}
+          {(() => { const { setCurrentView } = useContext(AppContext); return (
+            <>
+              <button className="action-btn primary" onClick={() => setCurrentView('admin-menu')}>📝 Add Menu Item</button>
+              <button className="action-btn success" onClick={() => setCurrentView('admin-orders')}>👁 View Orders</button>
+              <button className="action-btn info" onClick={() => setCurrentView('admin-analytics')}>📊 Generate Report</button>
+              <button className="action-btn warning" onClick={() => setCurrentView('admin-users')}>👥 Manage Users</button>
+            </>
+          ); })()}
         </div>
       </div>
 
@@ -649,7 +706,7 @@ const AdminMenuManagement = () => {
       description: 'Espresso with steamed milk and foam',
       price: 4.49,
       category: 'coffee',
-      image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1473923377535-0002805f57e8?q=80&w=1308&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
       isAvailable: true
     },
     {
@@ -658,10 +715,24 @@ const AdminMenuManagement = () => {
       description: 'Buttery, flaky French pastry',
       price: 3.99,
       category: 'pastry',
-      image: 'https://images.unsplash.com/photo-1555507036-ab794f4ec4d7?auto=format&fit=crop&w=400&q=80',
+      image: 'https://plus.unsplash.com/premium_photo-1670333242784-46b220ef90a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fENyb2lzc2FudHxlbnwwfHwwfHx8MA%3D%3D',
       isAvailable: false
     }
   ]);
+
+  // On mount, load saved admin items so seeds don't override persisted data
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('admin_menu_items');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Even if empty array, respect it (so deleted seeds don't reappear)
+          setMenuItems(parsed);
+        }
+      }
+    } catch {}
+  }, []);
   
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -675,19 +746,51 @@ const AdminMenuManagement = () => {
     name: '',
     description: '',
     price: '',
-    category: 'coffee',
+    category: '',
     image: '',
     isAvailable: true
   });
 
-  const categories = ['coffee', 'tea', 'pastry', 'sandwich', 'salad', 'dessert'];
+  // Compute categories dynamically from existing items
+  const categories = useMemo(() => {
+    const set = new Set(
+      menuItems
+        .map(i => (i.category || '').trim().toLowerCase())
+        .filter(Boolean)
+    );
+    return Array.from(set).sort();
+  }, [menuItems]);
+
+  // Load saved menu items from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('admin_menu_items');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setMenuItems(parsed);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load menu items from localStorage', e);
+    }
+  }, []);
+
+  // Persist menu items to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('admin_menu_items', JSON.stringify(menuItems));
+    } catch (e) {
+      console.error('Failed to save menu items to localStorage', e);
+    }
+  }, [menuItems]);
 
   const resetForm = () => {
     setFormData({
       name: '',
       description: '',
       price: '',
-      category: 'coffee',
+      category: '',
       image: '',
       isAvailable: true
     });
@@ -702,9 +805,11 @@ const AdminMenuManagement = () => {
     try {
       if (editingItem) {
         // Update existing item
-        setMenuItems(prev => prev.map(item => 
+        const updated = menuItems.map(item => 
           item._id === editingItem._id ? { ...item, ...formData } : item
-        ));
+        );
+        setMenuItems(updated);
+        try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
         alert('✅ Menu item updated successfully!');
       } else {
         // Add new item
@@ -713,7 +818,9 @@ const AdminMenuManagement = () => {
           _id: Date.now().toString(),
           price: parseFloat(formData.price)
         };
-        setMenuItems(prev => [...prev, newItem]);
+        const updated = [...menuItems, newItem];
+        setMenuItems(updated);
+        try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
         alert('✅ Menu item added successfully!');
       }
       resetForm();
@@ -734,14 +841,18 @@ const AdminMenuManagement = () => {
   const handleDelete = (id) => {
     if (!window.confirm('⚠ Are you sure you want to delete this item?')) return;
     
-    setMenuItems(prev => prev.filter(item => item._id !== id));
+    const updated = menuItems.filter(item => item._id !== id);
+    setMenuItems(updated);
+    try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
     alert('✅ Menu item deleted successfully!');
   };
 
   const toggleAvailability = (id) => {
-    setMenuItems(prev => prev.map(item => 
+    const updated = menuItems.map(item => 
       item._id === id ? { ...item, isAvailable: !item.isAvailable } : item
-    ));
+    );
+    setMenuItems(updated);
+    try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
   };
 
   const filteredItems = menuItems.filter(item => {
@@ -828,17 +939,19 @@ const AdminMenuManagement = () => {
               </div>
               <div className="form-group">
                 <label>🏷 Category *</label>
-                <select
+                {/* Allow typing a new category with suggestions from existing ones */}
+                <input
+                  list="categoryOptions"
                   value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="e.g. coffee, tea, pastry..."
                   required
-                >
+                />
+                <datalist id="categoryOptions">
                   {categories.map(cat => (
-                    <option key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </option>
+                    <option key={cat} value={cat} />
                   ))}
-                </select>
+                </datalist>
               </div>
               <div className="form-group">
                 <label>💰 Price ($) *</label>
@@ -1306,30 +1419,89 @@ const AdminAnalytics = () => (
 function App() {
   const [user, setUser] = useState(null);
   const [currentView, setCurrentView] = useState('auth');
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'light';
+  });
+  const [popup, setPopup] = useState({ show: false, message: '', type: 'success' });
   const [loading, setLoading] = useState(true);
+  const savedTheme = localStorage.getItem('theme');
+
+  // Global AOS initialization (single source of truth)
+  useEffect(() => {
+    AOS.init({
+      duration: 600,
+      easing: 'ease-out',
+      once: true,
+      offset: 80,
+      mirror: false,
+      disable: 'phone'
+    });
+  }, []);
+
+  // Refresh AOS when view/theme changes to bind animations to new DOM
+  useEffect(() => {
+    // Defer to after DOM updates
+    const id = setTimeout(() => {
+      try { AOS.refresh(); } catch {}
+    }, 0);
+    return () => clearTimeout(id);
+  }, [currentView, theme]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+    const lastView = localStorage.getItem('last_view');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      setTheme(savedTheme);
+      try { document.documentElement.setAttribute('data-theme', savedTheme); } catch {}
+    }
     if (token && userData) {
       setUser(JSON.parse(userData));
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const parsedUser = JSON.parse(userData);
-      setCurrentView(parsedUser.role === 'admin' ? 'admin-dashboard' : 'customer-home');
+      // Restore last visited view if valid for role
+      if (typeof lastView === 'string' && lastView.length > 0) {
+        const isAdmin = parsedUser.role === 'admin';
+        const isValid = isAdmin ? lastView.startsWith('admin-') : lastView.startsWith('customer-');
+        setCurrentView(isValid ? lastView : (isAdmin ? 'admin-dashboard' : 'customer-home'));
+      } else {
+        setCurrentView(parsedUser.role === 'admin' ? 'admin-dashboard' : 'customer-home');
+      }
     } else {
+      setLoading(false);
       setCurrentView('auth');
+      return;
     }
     setLoading(false);
   }, []);
 
+  // Always start at top on view change
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [currentView]);
+
   const logout = () => {
+    const username = user?.username || 'User';
+    setPopup({
+      show: true,
+      message: `@${username} you log out`,
+      type: 'info'
+    });
+    
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setCurrentView('auth');
   };
+
+  // Sync theme to DOM and persist
+  useEffect(() => {
+    try { document.documentElement.setAttribute('data-theme', theme); } catch {}
+    try { localStorage.setItem('theme', theme); } catch {}
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
 
   if (loading) {
     return (
@@ -1341,12 +1513,18 @@ function App() {
   }
 
   return (
-    <AppContext.Provider value={{ user, setUser, currentView, setCurrentView, logout }}>
+    <AppContext.Provider value={{ user, setUser, currentView, setCurrentView, logout, theme, toggleTheme }}>
       <CartProvider>
         <div className="App">
           {currentView === 'auth' && <AuthView />}
           {user && user.role === 'admin' && <AdminLayout />}
           {user && user.role === 'user' && <CustomerLayout />}
+          <Popup 
+            message={popup.message}
+            type={popup.type}
+            isVisible={popup.show}
+            onClose={() => setPopup({...popup, show: false})}
+          />
         </div>
       </CartProvider>
     </AppContext.Provider>

@@ -63,11 +63,12 @@ const Menu = () => {
   }
 
   return (
-    <Container>
+    <Container data-aos="fade-in" data-aos-duration="600">
       <motion.h1 
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className="menu-title"
+        data-aos="fade-up"
       >
         Our Menu
       </motion.h1>
@@ -78,6 +79,7 @@ const Menu = () => {
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
+        data-aos="fade-up" data-aos-delay="100"
       >
         {categories.map(category => (
           <Button
@@ -86,6 +88,7 @@ const Menu = () => {
             onClick={() => setSelectedCategory(category)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            data-aos="zoom-in" data-aos-delay="100"
           >
             {category.charAt(0).toUpperCase() + category.slice(1)}
           </Button>
@@ -98,6 +101,7 @@ const Menu = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
+        data-aos="fade-up" data-aos-delay="150"
       >
         <AnimatePresence>
           {filteredItems.map(item => (
@@ -106,6 +110,7 @@ const Menu = () => {
               variants={itemVariants}
               layout
               exit={{ opacity: 0, scale: 0.8 }}
+              data-aos="zoom-in" data-aos-delay="100"
             >
               <Card className="menu-item">
                 <img 
