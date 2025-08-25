@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { CartContext, useCart } from './context/AppContext';
 import axios from 'axios';
 import './App.css';
 import HomePage from './components/HomePage';
@@ -12,7 +13,6 @@ import SiteLogo from './logo.svg';
 import { formatINR } from './utils/currency';
 
 const AppContext = createContext();
-const CartContext = createContext();
 
 // Cart Provider
 const CartProvider = ({ children }) => {
@@ -74,7 +74,7 @@ const CartProvider = ({ children }) => {
   );
 };
 
-const useCart = () => useContext(CartContext);
+// useCart is imported from context/AppContext to ensure a single shared instance
  
 // Authentication View
 const AuthView = () => {

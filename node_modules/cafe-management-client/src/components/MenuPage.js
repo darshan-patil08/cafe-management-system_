@@ -1,16 +1,46 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { useCart } from '../App';
+  import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useCart } from '../context/AppContext';
 import { formatINR } from '../utils/currency';
 
 const MenuPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [visibleItems, setVisibleItems] = useState(new Set());
+  const [detailsItem, setDetailsItem] = useState(null); // modal item
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { addToCart } = useCart();
   const observerRef = useRef();
 
+  // Modal controls
+  const openDetails = (item) => {
+    setDetailsItem(item);
+    setIsModalOpen(true);
+    // prevent background scroll
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  const closeDetails = () => {
+    setIsModalOpen(false);
+    setDetailsItem(null);
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = '';
+    }
+  };
+
+  // Close on ESC
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeDetails();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+  
+
   // Default seed items (shown alongside admin-created items)
-  const menuItems = [
+  const menuItems = useMemo(() => ([
     // Coffee Items
     {
       id: 1,
@@ -178,7 +208,7 @@ const MenuPage = () => {
       image: "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?auto=format&fit=crop&w=1200&q=90",
       description: "Fresh avocado on artisan sourdough bread"
     }
-  ];
+  ]), []);
 
   // Load admin-created items from localStorage
   const [adminItems, setAdminItems] = useState([]);
@@ -216,6 +246,7 @@ const MenuPage = () => {
     };
   }, []);
 
+
   // Combine defaults with admin items; hide explicitly unavailable; de-dupe by name (admin overrides)
   const combinedItems = useMemo(() => {
     const byName = new Map();
@@ -252,11 +283,21 @@ const MenuPage = () => {
     return [{ id: 'all', name: 'All Items', icon: '🍽️' }, ...dynamic];
   }, [combinedItems]);
 
-  const filteredItems = combinedItems.filter(item => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredItems = useMemo(() => {
+    return combinedItems.filter(item => {
+      const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [combinedItems, selectedCategory, searchTerm]);
+
+  // Refresh AOS when filtered items change so first two animate without delay
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.AOS && typeof window.AOS.refresh === 'function') {
+      // small microtask to ensure DOM is updated
+      setTimeout(() => window.AOS.refresh(), 0);
+    }
+  }, [filteredItems]);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -266,7 +307,12 @@ const MenuPage = () => {
           if (entry.isIntersecting) {
             const itemId = entry.target.getAttribute('data-item-id');
             if (itemId) {
-              setVisibleItems(prev => new Set([...prev, itemId]));
+              setVisibleItems(prev => {
+                if (prev.has(itemId)) return prev;
+                const next = new Set(prev);
+                next.add(itemId);
+                return next;
+              });
             }
           }
         });
@@ -284,30 +330,21 @@ const MenuPage = () => {
     };
   }, []);
 
-  // Reset visible items when search or category changes
-  useEffect(() => {
-    setVisibleItems(new Set());
-    // Re-observe all items after a short delay
-    setTimeout(() => {
-      const items = document.querySelectorAll('.menu-item-card');
-      items.forEach(item => {
-        if (observerRef.current) {
-          observerRef.current.observe(item);
-        }
-      });
-    }, 100);
-  }, [searchTerm, selectedCategory]);
+  // Note: We intentionally do NOT use an effect to force-show first two items to avoid timing/flicker.
+  // We render first two as visible by default; observer will reveal the rest smoothly.
 
   // Observe items when they mount
   const handleItemRef = (element, itemId) => {
-    if (element && observerRef.current) {
+    if (element) {
       element.setAttribute('data-item-id', itemId);
-      observerRef.current.observe(element);
+      if (observerRef.current) {
+        observerRef.current.observe(element);
+      }
     }
   };
 
   return (
-    <div className="kaffix-menu" data-aos="fade-in" data-aos-duration="600">
+    <div className="kaffix-menu">
       <div className="container">
         {/* Menu Header */}
         <div className="menu-header" data-aos="fade-up">
@@ -344,11 +381,12 @@ const MenuPage = () => {
         </div>
 
         {/* Menu Items Grid */}
-        <div className="menu-items" data-aos="fade-up" data-aos-delay="200">
+        <div className="menu-items">
           <div className="menu-grid">
             {filteredItems.map((item, index) => {
               const itemId = item._id || item.id || `${item.name}-${index}`;
-              const isVisible = visibleItems.has(itemId);
+              const isFirstTwo = index < 2;
+              const isVisible = isFirstTwo || visibleItems.has(itemId);
               
               return (
                 <div 
@@ -356,15 +394,23 @@ const MenuPage = () => {
                   ref={(el) => handleItemRef(el, itemId)}
                   className={`menu-item-card ${isVisible ? 'animate-in' : 'animate-out'}`}
                   style={{
-                    animationDelay: `${index * 50}ms`
+                    animationDelay: index < 2 ? '0ms' : `${index * 50}ms`
                   }}
-                  data-aos="zoom-in"
-                  data-aos-delay={(index % 6) * 75}
+                  {...(index < 2 
+                    ? { 'data-aos': 'zoom-in', 'data-aos-delay': 0, 'data-aos-offset': 0, 'data-aos-once': 'true' } 
+                    : { 'data-aos': 'zoom-in', 'data-aos-delay': (index % 6) * 75 })}
+                  data-first-two={index < 2}
                 >
                   <div className="item-image">
                     <img src={item.image} alt={item.name} loading="lazy" />
                     <div className="item-overlay">
-                      <button className="view-details-btn">View Details</button>
+                      <button 
+                        className="view-details-btn ripple"
+                        type="button"
+                        onClick={() => openDetails(item)}
+                      >
+                        View Details
+                      </button>
                     </div>
                   </div>
                   <div className="item-content">
@@ -386,6 +432,57 @@ const MenuPage = () => {
             })}
           </div>
         </div>
+
+        {/* Details Modal */}
+        {isModalOpen && detailsItem && (
+          <div className="modal-backdrop" onClick={(e) => {
+            if (e.target.classList.contains('modal-backdrop')) closeDetails();
+          }}>
+            <div className="modal-card" role="dialog" aria-modal="true" aria-label={`${detailsItem.name} details`}>
+              <button className="modal-close" aria-label="Close" onClick={closeDetails}>×</button>
+              <div className="modal-content">
+                <div className="modal-image">
+                  <img src={detailsItem.image} alt={detailsItem.name} />
+                </div>
+                <div className="modal-body">
+                  <h3>{detailsItem.name}</h3>
+                  {detailsItem.description && (
+                    <p className="modal-desc">{detailsItem.description}</p>
+                  )}
+                  <div className="modal-meta">
+                    {detailsItem.category && (
+                      <span className="badge category">{detailsItem.category}</span>
+                    )}
+                    {detailsItem.prepTime && (
+                      <span className="badge prep">Prep: {detailsItem.prepTime} min</span>
+                    )}
+                    {detailsItem.allergens && detailsItem.allergens.length > 0 && (
+                      <span className="badge allergens">Allergens: {detailsItem.allergens.join(', ')}</span>
+                    )}
+                  </div>
+                  <div className="modal-footer">
+                    <div className="price">₹{Number(detailsItem.price).toFixed(2)}</div>
+                    <div className="modal-actions">
+                      <button
+                        className="primary-btn ripple"
+                        type="button"
+                        onMouseDown={(e) => {
+                          const r = e.currentTarget.getBoundingClientRect();
+                          e.currentTarget.style.setProperty('--x', `${e.clientX - r.left}px`);
+                          e.currentTarget.style.setProperty('--y', `${e.clientY - r.top}px`);
+                        }}
+                        onClick={() => { addToCart(detailsItem); closeDetails(); }}
+                      >
+                        Add to Cart
+                      </button>
+                      <button className="secondary-btn" type="button" onClick={closeDetails}>Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

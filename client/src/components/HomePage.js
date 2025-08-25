@@ -26,12 +26,6 @@ const HomePage = () => {
               >
                 Order Now
               </button>
-              <button 
-                className="cta-btn secondary"
-                onClick={() => setCurrentView('customer-menu')}
-              >
-                View Menu
-              </button>
             </div>
           </div>
           <div className="hero-stats">
