@@ -333,7 +333,7 @@ const CustomerLayout = () => {
           <div className="nav-links">
             <button 
               className={currentView === 'customer-home' ? 'nav-link active' : 'nav-link'}
-              onClick={() => setCurrentView('customer-home')}
+              onClick={() => navigateToSection('home')}
             >
               Home
             </button>
@@ -399,10 +399,10 @@ const CustomerLayout = () => {
           <div className="footer-section">
             <h4>Quick Links</h4>
             <ul>
-              <li><button onClick={() => setCurrentView('customer-home')}>Home</button></li>
-              <li><button onClick={() => setCurrentView('customer-about')}>About</button></li>
-              <li><button onClick={() => setCurrentView('customer-menu')}>Menu</button></li>
-              <li><button onClick={() => setCurrentView('customer-contact')}>Contact</button></li>
+              <li><button onClick={() => navigateToSection('home')}>Home</button></li>
+              <li><button onClick={() => navigateToSection('about')}>About</button></li>
+              <li><button onClick={() => navigateToSection('menu')}>Menu</button></li>
+              <li><button onClick={() => navigateToSection('contact')}>Contact</button></li>
             </ul>
           </div>
           <div className="footer-section">

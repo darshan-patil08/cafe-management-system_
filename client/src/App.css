@@ -13,6 +13,20 @@ body {
   min-height: 100vh;
 }
 
+/* Smooth scroll globally */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure anchored sections clear the sticky nav */
+#home,
+#contact,
+.about-section,
+.menu-section,
+.contact-section {
+  scroll-margin-top: 100px; /* adjust if nav height changes */
+}
+
 .App {
   min-height: 100vh;
 }
@@ -1463,6 +1477,32 @@ html[data-theme="dark"] .faq-item {
   border-color: var(--border);
 }
 
+/* Contact section dark mode fixes */
+html[data-theme="dark"] .contact-form {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+html[data-theme="dark"] .contact-form h2,
+html[data-theme="dark"] .contact-info h2,
+html[data-theme="dark"] .contact-info h3 {
+  color: var(--text);
+}
+
+/* Contact info cards and icons readability in dark */
+html[data-theme="dark"] .info-item {
+  border: 1px solid var(--border);
+}
+html[data-theme="dark"] .info-item h3 {
+  color: var(--text);
+}
+html[data-theme="dark"] .info-icon {
+  color: var(--text);
+  opacity: 0.9;
+}
+
 /* Muted text in dark */
 html[data-theme="dark"] .product-info p,
 html[data-theme="dark"] .about-features li,
@@ -1950,7 +1990,7 @@ html[data-theme="dark"] .cta-btn.secondary {
 
 .menu-item-image {
   position: relative;
-  height: 250px;
+  height: 260px;
   overflow: hidden;
 }
 
@@ -2448,7 +2488,7 @@ html[data-theme="dark"] .cta-btn.secondary {
 }
 
 .menu-item-image {
-  height: 200px;
+  height: 260px;
   overflow: hidden;
 }
 
@@ -4258,6 +4298,104 @@ html[data-theme="dark"] .popup-close:hover {
 .modal-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 8px; }
 .modal-actions { display: flex; gap: 10px; }
 
+/* ---- MenuPage item footer alignment (price | Add to Cart | View Details) ---- */
+/* Keep this specific so other item-footers across the app remain unchanged */
+.kaffix-menu .menu-item-card .item-footer,
+.kaffix-menu .menu-item .item-footer {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.kaffix-menu .menu-item-card .item-footer .item-price,
+.kaffix-menu .menu-item .item-footer .item-price {
+  font-weight: 800;
+  color: #8B4513;
+}
+
+.kaffix-menu .menu-item-card .item-footer .add-cart-btn,
+.kaffix-menu .menu-item .item-footer .add-cart-btn {
+  justify-self: center;
+}
+
+.kaffix-menu .menu-item-card .item-footer .view-details-btn,
+.kaffix-menu .menu-item .item-footer .view-details-btn {
+  justify-self: end;
+}
+
+/* Attractive View Details button */
+.view-details-btn {
+  background: transparent;
+  color: #8B4513;
+  border: 2px solid #8B4513;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* No emoji/icon as requested */
+.view-details-btn::before { content: none; }
+
+.view-details-btn:hover {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(139, 69, 19, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Responsive tweak: stack a bit nicer on small screens */
+@media (max-width: 520px) {
+  .kaffix-menu .menu-item-card .item-footer,
+  .kaffix-menu .menu-item .item-footer {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 10px;
+  }
+  .kaffix-menu .menu-item-card .item-footer .item-price,
+  .kaffix-menu .menu-item .item-footer .item-price {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .kaffix-menu .menu-item-card .item-footer .add-cart-btn {
+    justify-self: start;
+  }
+  .kaffix-menu .menu-item-card .item-footer .view-details-btn {
+    justify-self: end;
+  }
+}
+
+/* ---- Modal Nutrition Facts: table-like look ---- */
+.modal-section.nutrition .nutrition-grid {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--card);
+}
+
+.modal-section.nutrition .nutrition-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.modal-section.nutrition .nutrition-item:first-child {
+  border-top: none;
+}
+
+.modal-section.nutrition .nutrition-item .label {
+  font-weight: 700;
+}
+
+.modal-section.nutrition .nutrition-item .value {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Buttons */
 .primary-btn {
   background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
@@ -4343,6 +4481,26 @@ html[data-theme="dark"] .secondary-btn { background: #2a2f3a; color: #e7e7e7; }
   transform: translateZ(0);
   transition: transform 140ms cubic-bezier(.2,.8,.2,1), box-shadow 140ms cubic-bezier(.2,.8,.2,1);
   will-change: transform, box-shadow;
+}
+
+/* Make menu cards flex columns so footer stays at bottom consistently */
+.kaffix-menu .menu-item-card,
+.kaffix-menu .menu-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.kaffix-menu .menu-item-card .item-content,
+.kaffix-menu .menu-item .item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.kaffix-menu .menu-item-card .item-footer,
+.kaffix-menu .menu-item .item-footer {
+  margin-top: auto;
 }
 
 .kaffix-menu .menu-item-card:hover,

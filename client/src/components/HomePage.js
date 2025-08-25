@@ -1,11 +1,15 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../App';
+import ContactPage from './ContactPage';
 
 const HomePage = () => {
   const { setCurrentView } = useContext(AppContext);
 
   return (
     <div className="homepage">
+      {/* Top anchor for Home */}
+      <div id="home"></div>
+
       {/* Hero Section */}
       <section className="hero-section kaffix-hero" data-aos="fade-in" data-aos-duration="800">
         <div className="hero-background hero-bg">
@@ -46,7 +50,7 @@ const HomePage = () => {
       </section>
 
       {/* About Section */}
-      <section className="about-section" data-aos="fade-up" data-aos-offset="120">
+      <section id="about" className="about-section" data-aos="fade-up" data-aos-offset="120">
         <div className="container">
           <div className="about-grid">
             <div className="about-image" data-aos="fade-right" data-aos-delay="100">
@@ -118,7 +122,7 @@ const HomePage = () => {
       </section>
 
       {/* Menu Section */}
-      <section className="menu-section" data-aos="fade-up">
+      <section id="menu" className="menu-section" data-aos="fade-up">
         <div className="container">
           <div className="section-header">
             <h2>Made fresh, made for you.</h2>
@@ -169,7 +173,7 @@ const HomePage = () => {
             ].map((item, index) => (
               <div key={index} className="menu-item" data-aos="zoom-in" data-aos-delay={(index % 4) * 100}>
                 <div className="menu-item-image">
-                  <img src={item.image} alt={item.name} />
+                  <img src={item.image} alt={item.name} loading="lazy" />
                 </div>
                 <div className="menu-item-content">
                   <h4>{item.name}</h4>
@@ -313,6 +317,13 @@ const HomePage = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Contact Section at the end */}
+      <section id="contact" className="contact-section" data-aos="fade-up">
+        <div className="container">
+          <ContactPage />
         </div>
       </section>
     </div>
