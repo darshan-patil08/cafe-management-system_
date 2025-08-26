@@ -45,216 +45,228 @@ const MenuPage = () => {
     {
       id: 1,
       name: "Espresso",
-      price: 3.99,
+      price: 199,
       category: 'coffee',
-      image: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=1200&q=90",
+      image: "https://images.unsplash.com/photo-1579992357154-faf4bde95b3d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZXNwcmVzc298ZW58MHx8MHx8fDA%3D",
       description: "Rich, concentrated coffee shot with perfect crema",
-      prepTime: 1,
-      ingredients: ["Coffee beans", "Water"],
-      nutrition: { calories: 3, protein: 0, carbs: 1, sugar: 0, caffeine: '80mg' }
+      prepTime: "1–2",
+      ingredients: ["Finely ground coffee", "Hot water"],
+      nutrition: { calories: '5 kcal', protein: '0g', carbs: '1g', fat: '0g', sugar: '0g', caffeine: '80mg' }
     },
     {
       id: 2,
       name: "Cappuccino",
-      price: 4.49,
+      price: 259,
       category: 'coffee',
-      image: "https://images.unsplash.com/photo-1473923377535-0002805f57e8?q=80&w=1308&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "https://images.unsplash.com/photo-1710173472469-9d28e977914c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fENhcHB1Y2Npbm98ZW58MHx8MHx8fDA%3D",
       description: "Espresso with steamed milk and thick foam",
-      prepTime: 4,
-      ingredients: ["Espresso", "Steamed milk", "Milk foam"],
-      nutrition: { calories: 120, protein: 6, carbs: 10, sugar: 9, caffeine: '80mg' }
+      prepTime: "3–5",
+      ingredients: ["Espresso", "Steamed milk", "Thick milk foam"],
+      nutrition: { calories: '120 kcal', protein: '6g', carbs: '10g', fat: '6g', sugar: '9g', caffeine: '80mg' }
     },
     {
       id: 3,
       name: "Latte",
-      price: 4.99,
+      price: 289,
       category: 'coffee',
       image: "https://images.unsplash.com/photo-1561882468-9110e03e0f78?auto=format&fit=crop&w=1200&q=90",
       description: "Smooth espresso with steamed milk and light foam",
-      prepTime: 4,
-      ingredients: ["Espresso", "Steamed milk", "Light foam"],
-      nutrition: { calories: 190, protein: 9, carbs: 18, sugar: 17, caffeine: '80mg' }
+      prepTime: "3–5",
+      ingredients: ["Espresso shot", "Steamed milk", "Milk foam"],
+      nutrition: { calories: '190 kcal', protein: '12g', carbs: '19g', fat: '7g', sugar: '18g', caffeine: '80mg' }
     },
     {
       id: 4,
       name: "Americano",
-      price: 3.49,
+      price: 215,
       category: 'coffee',
       image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       description: "Espresso with hot water for a clean, strong taste",
-      prepTime: 2,
-      ingredients: ["Espresso", "Hot water"],
-      nutrition: { calories: 10, protein: 0, carbs: 2, sugar: 0, caffeine: '80mg' }
+      prepTime: "2–3",
+      ingredients: ["Espresso shot", "Hot water"],
+      nutrition: { calories: '15 kcal', protein: '0g', carbs: '2g', fat: '0g', sugar: '0g', caffeine: '80mg' }
     },
     {
       id: 5,
       name: "Iced Coffee",
-      price: 3.99,
+      price: 239,
       category: 'coffee',
       image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=1200&q=90",
       description: "Refreshing cold brew coffee served over ice",
-      prepTime: 2,
-      ingredients: ["Cold brew coffee", "Ice", "Simple syrup (optional)"],
-      nutrition: { calories: 5, protein: 0, carbs: 1, sugar: 0, caffeine: '150mg' }
+      prepTime: "2–3",
+      ingredients: ["Brewed coffee", "Ice cubes", "Optional milk/syrup"],
+      nutrition: { calories: '80 kcal', protein: '1g', carbs: '20g', fat: '0g', sugar: '15g', caffeine: '150mg' }
     },
     {
       id: 6,
       name: "Mocha",
-      price: 5.49,
+      price: 349,
       category: 'coffee',
       image: "https://plus.unsplash.com/premium_photo-1668970851336-6c81cc888ba7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8TW9jaGF8ZW58MHx8MHx8fDA%3D",
       description: "Rich espresso with chocolate and steamed milk",
-      prepTime: 5,
-      ingredients: ["Espresso", "Steamed milk", "Chocolate syrup", "Whipped cream (optional)"],
-      nutrition: { calories: 260, protein: 8, carbs: 34, sugar: 30, caffeine: '90mg' }
+      prepTime: "4–6",
+      ingredients: ["Espresso", "Steamed milk", "Chocolate syrup", "Whipped cream"],
+      nutrition: { calories: '290 kcal', protein: '10g', carbs: '35g', fat: '12g', sugar: '27g', caffeine: '90mg' }
     },
     {
       id: 7,
       name: "Macchiato",
-      price: 4.29,
+      price: 359,
       category: 'coffee',
       image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=1200&q=90",
       description: "Espresso with a dollop of foamed milk",
-      prepTime: 3,
-      ingredients: ["Espresso", "Foamed milk"],
-      nutrition: { calories: 15, protein: 1, carbs: 1, sugar: 1, caffeine: '80mg' }
+      prepTime: "2–3",
+      ingredients: ["Espresso", "Small amount of milk foam"],
+      nutrition: { calories: '100 kcal', protein: '5g', carbs: '10g', fat: '5g', sugar: '8g', caffeine: '80mg' }
     },
     
     // Tea Items
     {
       id: 8,
       name: "Earl Grey Tea",
-      price: 3.29,
+      price: 249,
       category: 'tea',
       image: "https://images.unsplash.com/photo-1744160252607-1f195a3564c2?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       description: "Classic black tea with bergamot oil",
-      prepTime: 3,
-      ingredients: ["Black tea", "Bergamot oil", "Water"],
-      nutrition: { calories: 2, protein: 0, carbs: 0, sugar: 0, caffeine: '40mg' }
+      prepTime: "3–4",
+      ingredients: ["Black tea leaves", "Bergamot oil", "Hot water"],
+      nutrition: { calories: '0 kcal', protein: '0g', carbs: '0g', fat: '0g', sugar: '0g', caffeine: '40mg' }
     },
     {
       id: 9,
       name: "Green Tea Latte",
-      price: 4.49,
+      price: 299,
       category: 'tea',
       image: "https://plus.unsplash.com/premium_photo-1673459683998-c6f7e2804f92?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8R3JlZW4lMjBUZWElMjBMYXR0ZXxlbnwwfHwwfHx8MA%3D%3D",
       description: "Matcha green tea with steamed milk",
-      prepTime: 4,
-      ingredients: ["Matcha", "Steamed milk", "Sweetener (optional)"],
-      nutrition: { calories: 120, protein: 6, carbs: 14, sugar: 10, caffeine: '70mg' }
+      prepTime: "3–4",
+      ingredients: ["Matcha green tea powder", "Steamed milk", "Sweetener"],
+      nutrition: { calories: '190 kcal', protein: '8g', carbs: '28g', fat: '5g', sugar: '25g', caffeine: '70mg' }
     },
     {
       id: 10,
       name: "Chamomile Tea",
-      price: 3.19,
+      price: 250,
       category: 'tea',
       image: "https://images.unsplash.com/photo-1654713803623-3d2b9d39f6b3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       description: "Soothing herbal tea perfect for relaxation",
-      prepTime: 3,
-      ingredients: ["Chamomile flowers", "Water", "Honey (optional)"],
-      nutrition: { calories: 2, protein: 0, carbs: 0, sugar: 0, caffeine: '0mg' }
+      prepTime: "4–5",
+      ingredients: ["Chamomile flowers", "Hot water"],
+      nutrition: { calories: '0–2 kcal', protein: '0g', carbs: '0g', fat: '0g', sugar: '0g', caffeine: '0mg' }
     },
     {
       id: 11,
       name: "Chai Latte",
-      price: 4.79,
+      price: 99,
       category: 'tea',
       image: "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?auto=format&fit=crop&w=1200&q=90",
       description: "Spiced tea blend with steamed milk and foam",
-      prepTime: 5,
-      ingredients: ["Black tea", "Spices", "Steamed milk"],
-      nutrition: { calories: 180, protein: 6, carbs: 28, sugar: 24, caffeine: '50mg' }
+      prepTime: "4–6",
+      ingredients: ["Black tea", "Milk", "Chai spices (cinnamon, ginger, cardamom)", "Sugar"],
+      nutrition: { calories: '200 kcal', protein: '7g', carbs: '33g', fat: '5g', sugar: '32g', caffeine: '50mg' }
     },
     
     // Pastries
     {
       id: 12,
       name: "Croissant",
-      price: 3.99,
+      price: 350,
       category: 'pastry',
       image: "https://plus.unsplash.com/premium_photo-1670333242784-46b220ef90a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fENyb2lzc2FudHxlbnwwfHwwfHx8MA%3D%3D",
       description: "Buttery, flaky French pastry",
-      prepTime: 10,
-      ingredients: ["Flour", "Butter", "Yeast", "Sugar", "Salt"],
-      nutrition: { calories: 230, protein: 5, carbs: 26, sugar: 6, caffeine: '0mg' }
+      prepTime: "5–7",
+      ingredients: ["Flour", "Butter", "Yeast", "Milk", "Sugar", "Salt"],
+      nutrition: { calories: '~270 kcal', protein: '6g', carbs: '31g', fat: '14g', sugar: '6g', caffeine: '0mg' }
     },
     {
       id: 13,
       name: "Blueberry Muffin",
-      price: 3.49,
+      price: 270,
       category: 'pastry',
       image: "https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Qmx1ZWJlcnJ5JTIwTXVmZmlufGVufDB8fDB8fHww",
       description: "Fresh baked muffin with wild blueberries",
-      prepTime: 8,
-      ingredients: ["Flour", "Sugar", "Eggs", "Blueberries", "Butter"],
-      nutrition: { calories: 320, protein: 5, carbs: 45, sugar: 28, caffeine: '0mg' }
+      prepTime: "2–3",
+      ingredients: ["Flour", "Blueberries", "Sugar", "Butter", "Eggs", "Baking powder"],
+      nutrition: { calories: '~380 kcal', protein: '6g', carbs: '53g', fat: '16g', sugar: '35g', caffeine: '0mg' }
     },
     {
       id: 14,
       name: "Chocolate Croissant",
-      price: 4.29,
+      price: 299,
       category: 'pastry',
       image: "https://media.istockphoto.com/id/624138466/photo/chocolate-drizzled-croissants.webp?a=1&b=1&s=612x612&w=0&k=20&c=I0R-kLso9c3BVgsvrLCg3QEqLKXt5Aek8ZVSPLdmBuM=",
       description: "Flaky pastry filled with rich dark chocolate",
-      prepTime: 9,
-      ingredients: ["Flour", "Butter", "Dark chocolate", "Sugar", "Yeast"],
-      nutrition: { calories: 290, protein: 6, carbs: 34, sugar: 16, caffeine: '6mg' }
+      prepTime: "5–7",
+      ingredients: ["Croissant dough", "Dark chocolate", "Butter", "Sugar"],
+      nutrition: { calories: '~320 kcal', protein: '6g', carbs: '36g', fat: '17g', sugar: '14g', caffeine: '6mg' }
     },
     {
       id: 15,
       name: "Cinnamon Roll",
-      price: 4.49,
+      price: 360,
       category: 'pastry',
       image: "https://images.unsplash.com/photo-1645995575875-ea6511c9d127?q=80&w=715&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       description: "Warm, sweet roll with cinnamon and glaze",
-      prepTime: 12,
-      ingredients: ["Flour", "Sugar", "Butter", "Cinnamon", "Yeast"],
-      nutrition: { calories: 420, protein: 7, carbs: 60, sugar: 35, caffeine: '0mg' }
+      prepTime: "3–5",
+      ingredients: ["Dough", "Cinnamon-sugar filling", "Cream cheese glaze"],
+      nutrition: { calories: '~420 kcal', protein: '7g', carbs: '65g', fat: '16g', sugar: '39g', caffeine: '0mg' }
     },
     {
       id: 16,
       name: "Danish Pastry",
-      price: 3.79,
+      price: 199,
       category: 'pastry',
       image: "https://images.unsplash.com/photo-1633785587635-a5c1df91fa90?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8RGFuaXNoJTIwUGFzdHJ5fGVufDB8fDB8fHww",
       description: "Light, flaky pastry with fruit filling",
-      prepTime: 9,
-      ingredients: ["Flour", "Butter", "Fruit jam", "Sugar", "Yeast"],
-      nutrition: { calories: 280, protein: 5, carbs: 36, sugar: 18, caffeine: '0mg' }
+      prepTime: "4–5",
+      ingredients: ["Puff pastry dough", "Fruit/jam/cream cheese filling"],
+      nutrition: { calories: '~370 kcal', protein: '6g', carbs: '45g', fat: '18g', sugar: '20g', caffeine: '0mg' }
     },
     
     // Sandwiches
     {
       id: 17,
       name: "Club Sandwich",
-      price: 8.99,
+      price: 780,
       category: 'sandwich',
       image: "https://media.istockphoto.com/id/2182311758/photo/ultimate-club-sandwich-with-french-fries-and-sauce-served-in-basket-isolated-on-dark.webp?a=1&b=1&s=612x612&w=0&k=20&c=zuPyNW-HYMHW_S3b99ESXRPmf9bE3MUa0zay4zf1oWo=",
-      description: "Triple-decker with turkey, bacon, lettuce and tomato"
+      description: "Triple-decker with turkey, bacon, lettuce and tomato",
+      prepTime: "8–10",
+      ingredients: ["Bread", "Chicken/Turkey", "Bacon", "Lettuce", "Tomato", "Mayo"],
+      nutrition: { calories: '~500 kcal', protein: '28g', carbs: '45g', fat: '22g', sugar: '6g' }
     },
     {
       id: 18,
       name: "Grilled Cheese",
-      price: 6.49,
+      price: 569,
       category: 'sandwich',
       image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=1200&q=90",
-      description: "Classic grilled cheese with premium cheddar"
+      description: "Classic grilled cheese with premium cheddar",
+      prepTime: "5–7",
+      ingredients: ["Bread", "Butter", "Cheese"],
+      nutrition: { calories: '~400 kcal', protein: '14g', carbs: '33g', fat: '24g', sugar: '5g' }
     },
     {
       id: 19,
       name: "BLT Sandwich",
-      price: 7.99,
+      price: 699,
       category: 'sandwich',
       image: "https://images.unsplash.com/photo-1722041220514-f6a26e286f2e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8QkxUJTIwU2FuZHdpY2h8ZW58MHx8MHx8fDA%3D",
-      description: "Crispy bacon, lettuce, and tomato on toasted bread"
+      description: "Crispy bacon, lettuce, and tomato on toasted bread",
+      prepTime: "6–8",
+      ingredients: ["Bread", "Bacon", "Lettuce", "Tomato", "Mayo"],
+      nutrition: { calories: '~420 kcal', protein: '19g', carbs: '37g', fat: '22g', sugar: '6g' }
     },
     {
       id: 20,
       name: "Avocado Toast",
-      price: 7.49,
+      price: 350,
       category: 'sandwich',
       image: "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?auto=format&fit=crop&w=1200&q=90",
-      description: "Fresh avocado on artisan sourdough bread"
+      description: "Fresh avocado on artisan sourdough bread",
+      prepTime: "5–7",
+      ingredients: ["Whole-grain bread", "Ripe avocado", "Lemon", "Olive oil", "Salt", "Pepper"],
+      nutrition: { calories: '~350 kcal', protein: '9g', carbs: '30g', fat: '22g', sugar: '5g' }
     }
   ]), []);
 
@@ -303,12 +315,32 @@ const MenuPage = () => {
       const key = (it.name || '').trim().toLowerCase();
       if (key) byName.set(key, it);
     });
-    // admin items override if same name
+    // admin items merge with seed (fill missing fields)
     adminItems
       .filter(it => it && it.isAvailable !== false)
       .forEach(it => {
         const key = (it.name || '').trim().toLowerCase();
-        if (key) byName.set(key, it);
+        if (!key) return;
+        const base = byName.get(key) || {};
+        const merged = {
+          ...base,
+          ...it
+        };
+        // Only backfill when admin field is undefined or null (not for empty arrays/strings)
+        if (it.ingredients === undefined || it.ingredients === null) merged.ingredients = base.ingredients;
+        if (it.nutrition === undefined || it.nutrition === null) merged.nutrition = base.nutrition;
+        if (it.prepTime === undefined || it.prepTime === null) merged.prepTime = base.prepTime;
+        if (it.description === undefined || it.description === null) merged.description = base.description;
+        // Always prefer seed image so admin adopts menu image
+        if (base.image !== undefined && base.image !== null) {
+          merged.image = base.image;
+        }
+        if (it.category === undefined || it.category === null) merged.category = base.category;
+        // Always prefer seed price so admin adopts menu price
+        if (base.price !== undefined && base.price !== null) {
+          merged.price = base.price;
+        }
+        byName.set(key, merged);
       });
     return Array.from(byName.values());
   }, [adminItems, menuItems]);
