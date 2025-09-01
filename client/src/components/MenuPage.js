@@ -1,4 +1,4 @@
-  import React, { useEffect, useMemo, useRef, useState } from 'react';
+    import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useCart } from '../context/AppContext';
 import { formatINR } from '../utils/currency';
 
@@ -10,6 +10,24 @@ const MenuPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addToCart } = useCart();
   const observerRef = useRef();
+
+  // Ensure Menu page always starts at the top and disable browser's automatic scroll restoration
+  useEffect(() => {
+    let prevRestoration;
+    if (typeof window !== 'undefined' && window.history && 'scrollRestoration' in window.history) {
+      prevRestoration = window.history.scrollRestoration;
+      try { window.history.scrollRestoration = 'manual'; } catch {}
+    }
+    // Scroll to top immediately and again in a microtask to cover different mount timings
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch {}
+    const id = setTimeout(() => { try { window.scrollTo(0, 0); } catch {} }, 0);
+    return () => {
+      clearTimeout(id);
+      if (typeof window !== 'undefined' && prevRestoration) {
+        try { window.history.scrollRestoration = prevRestoration; } catch {}
+      }
+    };
+  }, []);
 
   // Modal controls
   const openDetails = (item) => {
@@ -523,53 +541,55 @@ const MenuPage = () => {
                   <img src={detailsItem.image} alt={detailsItem.name} />
                 </div>
                 <div className="modal-body">
-                  <h3>{detailsItem.name}</h3>
-                  {detailsItem.description && (
-                    <p className="modal-desc">{detailsItem.description}</p>
-                  )}
-                  <div className="modal-meta">
-                    {detailsItem.category && (
-                      <span className="badge category">{detailsItem.category}</span>
+                  <div className="modal-body-content">
+                    <h3>{detailsItem.name}</h3>
+                    {detailsItem.description && (
+                      <p className="modal-desc">{detailsItem.description}</p>
                     )}
-                    {typeof detailsItem.prepTime !== 'undefined' && detailsItem.prepTime !== null && (
-                      <span className="badge prep">Prep: {detailsItem.prepTime} min</span>
-                    )}
-                    <span className="badge allergens">Allergens: {(detailsItem.allergens && detailsItem.allergens.length)
-                      ? detailsItem.allergens.join(', ')
-                      : 'N/A'}</span>
-                  </div>
-
-                  <div className="modal-section">
-                    <h4>Ingredients</h4>
-                    {detailsItem.ingredients && detailsItem.ingredients.length ? (
-                      <ul>
-                        {detailsItem.ingredients.map((ing, idx) => (
-                          <li key={idx}>{ing}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <ul>
-                        <li>Information not available</li>
-                      </ul>
-                    )}
-                  </div>
-
-                  <div className="modal-section nutrition">
-                    <h4>Nutrition Facts</h4>
-                    <div className="nutrition-grid">
-                      {detailsItem.nutrition && Object.keys(detailsItem.nutrition).length ? (
-                        Object.entries(detailsItem.nutrition).map(([k, v]) => (
-                          <div key={k} className="nutrition-item">
-                            <span className="label">{k.charAt(0).toUpperCase() + k.slice(1)}</span>
-                            <span className="value">{v}{typeof v === 'number' && k !== 'caffeine' ? 'g' : ''}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="nutrition-item">
-                          <span className="label">Details</span>
-                          <span className="value">Not available</span>
-                        </div>
+                    <div className="modal-meta">
+                      {detailsItem.category && (
+                        <span className="badge category">{detailsItem.category}</span>
                       )}
+                      {typeof detailsItem.prepTime !== 'undefined' && detailsItem.prepTime !== null && (
+                        <span className="badge prep">Prep: {detailsItem.prepTime} min</span>
+                      )}
+                      <span className="badge allergens">Allergens: {(detailsItem.allergens && detailsItem.allergens.length)
+                        ? detailsItem.allergens.join(', ')
+                        : 'N/A'}</span>
+                    </div>
+
+                    <div className="modal-section">
+                      <h4>Ingredients</h4>
+                      {detailsItem.ingredients && detailsItem.ingredients.length ? (
+                        <ul>
+                          {detailsItem.ingredients.map((ing, idx) => (
+                            <li key={idx}>{ing}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <ul>
+                          <li>Information not available</li>
+                        </ul>
+                      )}
+                    </div>
+
+                    <div className="modal-section nutrition">
+                      <h4>Nutrition Facts</h4>
+                      <div className="nutrition-grid">
+                        {detailsItem.nutrition && Object.keys(detailsItem.nutrition).length ? (
+                          Object.entries(detailsItem.nutrition).map(([k, v]) => (
+                            <div key={k} className="nutrition-item">
+                              <span className="label">{k.charAt(0).toUpperCase() + k.slice(1)}</span>
+                              <span className="value">{v}{typeof v === 'number' && k !== 'caffeine' ? 'g' : ''}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="nutrition-item">
+                            <span className="label">Details</span>
+                            <span className="value">Not available</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 

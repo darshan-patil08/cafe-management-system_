@@ -255,6 +255,12 @@ html {
   }
 }
 
+/* Ensure first two AOS-animated cards get the same smooth hover lift */
+.kaffix-menu .menu-item-card[data-first-two="true"]:hover {
+  transform: translateY(-12px) scale(1.01) !important;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
+}
+
 .brand-text {
   color: var(--text);
   font-size: 1.2rem;
@@ -4248,6 +4254,7 @@ html[data-theme="dark"] .popup-close:hover {
   color: var(--text);
   width: min(920px, 92vw);
   max-height: 88vh;
+  height: 88vh; /* establish definite height so inner 100% heights work */
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
@@ -4255,6 +4262,8 @@ html[data-theme="dark"] .popup-close:hover {
   transform: translateY(8px) scale(0.98);
   opacity: 0;
   animation: modalIn 200ms ease-out forwards;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-close {
@@ -4280,12 +4289,29 @@ html[data-theme="dark"] .popup-close:hover {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 0;
+  /* Ensure the grid can stretch to the modal's max height so right column can flex */
+  height: 100%;
+  min-height: 0; /* allow children to shrink and scroll */
+  flex: 1 1 auto; /* fill modal-card */
 }
 
 .modal-image { height: 100%; background: #000; }
 .modal-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-.modal-body { padding: 24px; }
+.modal-body {
+  /* Make right side column a flex container so footer stays pinned while content scrolls */
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* contain inner scroll */
+  min-height: 0; /* critical for grid child to allow inner scroll */
+}
+.modal-body-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding-right: 6px; /* small gutter so scrollbar doesn't overlay text */
+  -webkit-overflow-scrolling: touch; /* smoother scroll on iOS */
+}
 .modal-body h3 { font-size: 1.6rem; margin-bottom: 8px; color: #8B4513; }
 .modal-desc { color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
 
@@ -4295,8 +4321,21 @@ html[data-theme="dark"] .popup-close:hover {
 .badge.prep { background: #e9ecef; color: #495057; }
 .badge.allergens { background: #fff3cd; color: #856404; }
 
-.modal-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 8px; }
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 8px;
+  flex-shrink: 0; /* keep footer visible below the scrolling content */
+  position: sticky; /* extra safety so it stays visible */
+  bottom: 0;
+  background: var(--card);
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
 .modal-actions { display: flex; gap: 10px; }
+.modal-actions button { flex: 1 1 auto; min-width: 0; }
 
 /* ---- MenuPage item footer alignment (price | Add to Cart | View Details) ---- */
 /* Keep this specific so other item-footers across the app remain unchanged */
@@ -4505,7 +4544,7 @@ html[data-theme="dark"] .secondary-btn { background: #2a2f3a; color: #e7e7e7; }
 
 .kaffix-menu .menu-item-card:hover,
 .kaffix-menu .menu-item:hover {
-  transform: translateY(-12px) scale(1.01) !important; /* override inline AOS transforms */
+  transform: translateY(-12px) scale(1.01) !important; /* restore classic hover */
   box-shadow: 0 18px 48px rgba(0,0,0,0.18);
 }
 
@@ -4548,4 +4587,45 @@ html[data-theme="dark"] .secondary-btn { background: #2a2f3a; color: #e7e7e7; }
 .kaffix-menu .menu-item:hover .item-overlay {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* --- Scroll-triggered card entrance for MenuPage (IntersectionObserver in MenuPage.js) --- */
+.kaffix-menu .menu-item-card.animate-out {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.kaffix-menu .menu-item-card.animate-in {
+  /* Use an animation so inline style `animationDelay` from React is honored */
+  animation: cardPop 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+/* Avoid double-animating the first two items that already use AOS */
+.kaffix-menu .menu-item-card[data-first-two="true"].animate-in {
+  animation: none;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@keyframes cardPop {
+  0%   { opacity: 0; transform: scale(0.98); }
+  70%  { opacity: 1; transform: scale(1.01); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Stability for smoother GPU rendering during pop */
+.kaffix-menu .menu-item-card {
+  backface-visibility: hidden;
+  transform-origin: center center;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .kaffix-menu .menu-item-card.animate-in,
+  .kaffix-menu .menu-item-card.animate-out {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
