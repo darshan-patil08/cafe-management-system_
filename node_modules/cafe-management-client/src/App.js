@@ -9,8 +9,11 @@ import ContactPage from './components/ContactPage';
 import Popup from './components/Popup';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import SiteLogo from './logo.svg';
+import SiteLogo from './ChatGPT Image Aug 21, 2025, 07_57_24 PM.png';
 import { formatINR } from './utils/currency';
+import ScrollToTop from './components/ScrollToTop';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 
 const AppContext = createContext();
 
@@ -1425,7 +1428,7 @@ function App() {
   const [popup, setPopup] = useState({ show: false, message: '', type: 'success' });
   const [loading, setLoading] = useState(true);
   const savedTheme = localStorage.getItem('theme');
-
+ 
   // Global AOS initialization (single source of truth)
   useEffect(() => {
     AOS.init({
@@ -1530,6 +1533,7 @@ function App() {
     </AppContext.Provider>
   );
 }
+
 
 // Export context and hook for use in other components
 export { AppContext, useCart };
