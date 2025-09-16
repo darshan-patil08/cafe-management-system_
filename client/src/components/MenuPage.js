@@ -1,18 +1,30 @@
     import React, { useEffect, useMemo, useRef, useState } from 'react';
-import styled from 'styled-components';
 import { useCart } from '../context/AppContext';
 import { useMenu } from '../context/MenuContext';
 import { formatINR } from '../utils/currency';
+import CheckoutModal from './CheckoutModal';
 
 const MenuPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [visibleItems, setVisibleItems] = useState(new Set());
-  const [detailsItem, setDetailsItem] = useState(null); // modal item
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { addToCart } = useCart();
+  const [showCheckout, setShowCheckout] = useState(false);
+  const { addToCart, cartItems, updateQuantity, clearCart } = useCart();
   const { menuItems } = useMenu();
   const observerRef = useRef();
+  
+  const handleUpdateQuantity = (item, newQuantity) => {
+    if (newQuantity < 1) return;
+    updateQuantity(item, newQuantity);
+  };
+  
+  const handleProceedToCheckout = () => {
+    if (cartItems.length === 0) {
+      alert('Your cart is empty. Please add items before checkout.');
+      return;
+    }
+    setShowCheckout(true);
+  };
 
   // Ensure Menu page always starts at the top and disable browser's automatic scroll restoration
   useEffect(() => {
@@ -28,14 +40,6 @@ const MenuPage = () => {
     };
   }, []);
 
-  // Close on ESC
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'Escape') closeDetails();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
 
   // Items from shared MenuContext
   const combinedItems = useMemo(() => {
@@ -122,23 +126,8 @@ const MenuPage = () => {
     }
   };
 
-  // Modal controls
-  const openDetails = (item) => {
-    setDetailsItem(item);
-    setIsModalOpen(true);
-    // prevent background scroll
-    if (typeof document !== 'undefined') {
-      document.body.style.overflow = 'hidden';
-    }
-  };
-
-  const closeDetails = () => {
-    setIsModalOpen(false);
-    setDetailsItem(null);
-    if (typeof document !== 'undefined') {
-      document.body.style.overflow = '';
-    }
-  };
+  // Debug render log
+  console.log('[RENDER] MenuPage');
 
   return (
     <div className="kaffix-menu">
@@ -222,13 +211,6 @@ const MenuPage = () => {
                       >
                         Add to Cart
                       </button>
-                      <button 
-                        className="view-details-btn ripple"
-                        type="button"
-                        onClick={() => openDetails(item)}
-                      >
-                        View Details
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -237,141 +219,16 @@ const MenuPage = () => {
           </div>
         </div>
 
-        {/* Details Modal */}
-        {isModalOpen && detailsItem && (
-          <div className="modal-backdrop" onClick={(e) => {
-            if (e.target.classList.contains('modal-backdrop')) closeDetails();
-          }}>
-            <div className="modal-card" role="dialog" aria-modal="true" aria-label={`${detailsItem.name} details`}>
-              <button className="modal-close" aria-label="Close" onClick={closeDetails}>×</button>
-              <div className="modal-content">
-                <div className="modal-image">
-                  <img src={detailsItem.image} alt={detailsItem.name} />
-                </div>
-                <div className="modal-body">
-                  <div className="modal-body-content">
-                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      {detailsItem.name}
-                    </h3>
-                    {detailsItem.description && (
-                      <p className="modal-desc">{detailsItem.description}</p>
-                    )}
-                    <div className="modal-meta">
-                      {detailsItem.category && (
-                        <span className="badge category">{detailsItem.category}</span>
-                      )}
-                      {typeof detailsItem.prepTime !== 'undefined' && detailsItem.prepTime !== null && (
-                        <span className="badge prep">Prep: {detailsItem.prepTime} min</span>
-                      )}
-                      <span className="badge allergens">Allergens: {(detailsItem.allergens && detailsItem.allergens.length)
-                        ? detailsItem.allergens.join(', ')
-                        : 'N/A'}</span>
-                    </div>
-
-                    <div className="modal-section">
-                      <h4>Ingredients</h4>
-                      {detailsItem.ingredients && detailsItem.ingredients.length ? (
-                        <ul>
-                          {detailsItem.ingredients.map((ing, idx) => (
-                            <li key={idx}>{ing}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <ul>
-                          <li>Information not available</li>
-                        </ul>
-                      )}
-                    </div>
-
-                    <div className="modal-section nutrition">
-                      <h4>Nutrition Facts</h4>
-                      <div className="nutrition-grid">
-                        {detailsItem.nutrition && Object.keys(detailsItem.nutrition).length ? (
-                          Object.entries(detailsItem.nutrition).map(([k, v]) => (
-                            <div key={k} className="nutrition-item">
-                              <span className="label">{k.charAt(0).toUpperCase() + k.slice(1)}</span>
-                              <span className="value">{v}{typeof v === 'number' && k !== 'caffeine' ? 'g' : ''}</span>
-                            </div>
-                          ))
-                        ) : detailsItem.nutritionFacts ? (
-                          <div className="nutrition-item">
-                            <span className="label">Label</span>
-                            <span className="value">{detailsItem.nutritionFacts}</span>
-                          </div>
-                        ) : (
-                          <div className="nutrition-item">
-                            <span className="label">Details</span>
-                            <span className="value">Not available</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="modal-footer">
-                    <div className="price">{formatINR(Number(detailsItem.price))}</div>
-                    <div className="modal-actions">
-                      <button
-                        className="primary-btn ripple"
-                        type="button"
-                        onMouseDown={(e) => {
-                          const r = e.currentTarget.getBoundingClientRect();
-                          e.currentTarget.style.setProperty('--x', `${e.clientX - r.left}px`);
-                          e.currentTarget.style.setProperty('--y', `${e.clientY - r.top}px`);
-                        }}
-                        onClick={() => { addToCart(detailsItem); closeDetails(); }}
-                      >
-                        Add to Cart
-                      </button>
-                      <button className="secondary-btn" type="button" onClick={closeDetails}>Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+      
+      <CheckoutModal
+        isOpen={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        cartItems={cartItems}
+        updateQuantity={handleUpdateQuantity}
+      />
     </div>
   );
 };
 
 export default MenuPage;
-
-// Add responsive styles to Modal
-const ModalContent = styled.div`
-  flex-direction: row;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-`;
-
-const ModalInfo = styled.div`
-  padding: 0.5rem;
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const ModalActions = styled.div`
-  flex-direction: row;
-  @media (max-width: 480px) {
-    flex-direction: column;
-    gap: 0.5rem;
-    
-    & > button {
-      width: 100%;
-    }
-  }
-`;
-
-const NutritionInfo = styled.div`
-  margin: 1rem 0;
-  p {
-    margin-top: 0.5rem;
-    white-space: pre-wrap;
-  }
-`;

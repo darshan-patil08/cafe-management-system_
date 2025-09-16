@@ -336,8 +336,16 @@ html {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 30px 20px;
+  padding: 100px 20px 30px; /* Added top padding to account for fixed navbar */
   width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure main content is pushed below fixed navbar */
+.page-content {
+  
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -3604,28 +3612,32 @@ html[data-theme="dark"] .cta-btn.secondary {
 
 /* Modern Navigation Bar */
 .modern-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
   height: 70px;
-  background: var(--nav-bg);
-  backdrop-filter: blur(15px);
-  box-shadow: var(--shadow);
-  border-bottom: 1px solid var(--border);
-  z-index: 1000;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  color: var(--text);
+  width: 100% !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid transparent !important;
+  z-index: 9999;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  color: var(--text) !important;
+  transform: none !important;
 }
 
 .modern-nav.scrolled {
-  background: var(--nav-bg);
-  box-shadow: var(--shadow);
+  background: var(--nav-bg) !important;
+  backdrop-filter: blur(15px) !important;
+  box-shadow: var(--shadow) !important;
+  border-bottom: 1px solid var(--border) !important;
 }
 
 .nav-container {
+ 
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -3733,7 +3745,9 @@ html[data-theme="dark"] .cta-btn.secondary {
 
 /* Page Content Margin */
 .page-content {
-  margin-top: 70px;
+  min-height: calc(100vh - 70px);
+  position: relative;
+  z-index: 1;
 }
 
 /* Enhanced Footer */
@@ -3875,13 +3889,20 @@ html[data-theme="dark"] .cta-btn.secondary {
   }
   
   .modern-nav {
-    height: auto;
-    min-height: 70px;
-    padding: 10px 0;
+    height: auto !important;
+    min-height: 60px !important;
+    padding: 5px 0 !important;
+    position: fixed !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    transform: none !important;
   }
   
   .page-content {
-    margin-top: 90px;
+    padding-top: 90px !important;
+    min-height: calc(100vh - 90px);
+    position: relative;
+    z-index: 1;
   }
 }
 
@@ -3918,12 +3939,11 @@ html[data-theme="dark"] .cta-btn.secondary {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 10000;
   opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
 .popup-overlay.show {
@@ -4355,16 +4375,52 @@ html[data-theme="dark"] .popup-close:hover {
 
 /* ===== MenuPage Modal + Micro-interactions ===== */
 /* Modal Backdrop */
+/* Debug styles - remove after fixing */
 .modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  z-index: 1000;
-  animation: fadeIn 160ms ease-out;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  z-index: 99999 !important;
+  padding: 2rem !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  backdrop-filter: blur(4px) !important;
+  opacity: 1 !important;
+  border: 4px solid #ff0000 !important;
+  animation: none !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure modal is above everything */
+.modal-backdrop * {
+  position: relative;
+  z-index: 99999 !important;
+}
+
+/* Force modal-card to be visible */
+.modal-card {
+  z-index: 100000 !important;
+  position: relative !important;
+  opacity: 1 !important;
+  transform: none !important;
+  border: 2px solid #00ff00 !important;
+  background: white !important;
+  min-width: 300px;
+  max-width: 90%;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
 }
 
 /* Modal Card */
@@ -4372,73 +4428,125 @@ html[data-theme="dark"] .popup-close:hover {
   background: var(--card);
   color: var(--text);
   width: min(920px, 92vw);
-  max-height: 88vh;
-  height: 88vh; /* establish definite height so inner 100% heights work */
   border-radius: 16px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-  position: relative;
-  transform: translateY(8px) scale(0.98);
+  transform: translateY(30px);
+  transition: transform 0.3s ease, opacity 0.3s ease;
   opacity: 0;
-  animation: modalIn 200ms ease-out forwards;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
+  margin: 2rem 0;
+  position: relative;
+  z-index: 10000;
+  animation: slideUp 0.3s ease-out 0.1s forwards;
+}
+
+@keyframes slideUp {
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .modal-close {
   position: absolute;
-  top: 10px;
-  right: 12px;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
   width: 36px;
   height: 36px;
-  border: none;
   border-radius: 50%;
-  background: rgba(0,0,0,0.05);
-  color: inherit;
-  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
   cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: background 0.2s ease, transform 0.15s ease;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.modal-close:hover { background: rgba(0,0,0,0.08); transform: scale(1.05); }
+.modal-close:hover {
+  background: #8B4513;
+  color: white;
+  transform: rotate(90deg);
+}
 
 .modal-content {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 0;
-  /* Ensure the grid can stretch to the modal's max height so right column can flex */
-  height: 100%;
-  min-height: 0; /* allow children to shrink and scroll */
-  flex: 1 1 auto; /* fill modal-card */
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 120px);
+  scrollbar-width: thin;
+  scrollbar-color: #8B4513 transparent;
 }
 
-.modal-image { height: 100%; background: #000; }
-.modal-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: #8B4513;
+  border-radius: 3px;
+}
+
+.modal-image {
+  height: 220px;
+}
 
 .modal-body {
-  /* Make right side column a flex container so footer stays pinned while content scrolls */
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* contain inner scroll */
-  min-height: 0; /* critical for grid child to allow inner scroll */
+  padding: 2rem;
 }
-.modal-body-content {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding-right: 6px; /* small gutter so scrollbar doesn't overlay text */
-  -webkit-overflow-scrolling: touch; /* smoother scroll on iOS */
-}
-.modal-body h3 { font-size: 1.6rem; margin-bottom: 8px; color: #8B4513; }
-.modal-desc { color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
 
-.modal-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-.badge { padding: 6px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-.badge.category { background: #8B4513; color: #fff; }
-.badge.prep { background: #e9ecef; color: #495057; }
-.badge.allergens { background: #fff3cd; color: #856404; }
+.modal-body h3 {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+  color: #8B4513;
+}
+
+.modal-desc {
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.badge {
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.category {
+  background: #8B4513;
+  color: #fff;
+}
+
+.badge.prep {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.badge.allergens {
+  background: #fff3cd;
+  color: #856404;
+}
 
 .modal-footer {
   display: flex;
@@ -4446,15 +4554,377 @@ html[data-theme="dark"] .popup-close:hover {
   justify-content: space-between;
   gap: 16px;
   margin-top: 8px;
-  flex-shrink: 0; /* keep footer visible below the scrolling content */
-  position: sticky; /* extra safety so it stays visible */
+  flex-shrink: 0;
+  position: sticky;
   bottom: 0;
   background: var(--card);
   padding-top: 12px;
   border-top: 1px solid rgba(0,0,0,0.06);
 }
-.modal-actions { display: flex; gap: 10px; }
-.modal-actions button { flex: 1 1 auto; min-width: 0; }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions button {
+  width: 100%;
+}
+
+/* Responsive modal layout */
+@media (max-width: 768px) {
+  .modal-backdrop {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+  
+  .modal-card {
+    width: 100%;
+    margin: 1rem 0;
+    max-height: 95vh;
+  }
+  
+  .modal-content {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+    max-height: calc(95vh - 120px);
+  }
+  
+  .modal-image {
+    height: 220px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .modal-actions {
+    width: 100%;
+  }
+  
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+/* Dark theme tweaks for modal */
+html[data-theme="dark"] .modal-card {
+  background: var(--card);
+  color: var(--text);
+}
+
+html[data-theme="dark"] .modal-close {
+  background: rgba(255,255,255,0.06);
+}
+
+html[data-theme="dark"] .secondary-btn {
+  background: #2a2f3a;
+  color: #e7e7e7;
+}
+
+/* Menu Page: Strong, smooth card hover (override) */
+.kaffix-menu .menu-item-card,
+.kaffix-menu .menu-item {
+  position: relative;
+  transform: translateZ(0);
+  transition: transform 140ms cubic-bezier(.2,.8,.2,1), box-shadow 140ms cubic-bezier(.2,.8,.2,1);
+  will-change: transform, box-shadow;
+}
+
+/* Make menu cards flex columns so footer stays at bottom consistently */
+.kaffix-menu .menu-item-card,
+.kaffix-menu .menu-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.kaffix-menu .menu-item-card .item-content,
+.kaffix-menu .menu-item .item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.kaffix-menu .menu-item-card .item-footer,
+.kaffix-menu .menu-item .item-footer {
+  margin-top: auto;
+}
+
+.kaffix-menu .menu-item-card:hover,
+.kaffix-menu .menu-item:hover {
+  transform: translateY(-12px) scale(1.01) !important;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
+}
+
+.kaffix-menu .menu-item-card .item-image,
+.kaffix-menu .menu-item .item-image {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.kaffix-menu .menu-item-card .item-image img,
+.kaffix-menu .menu-item .item-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 160ms ease-out;
+}
+
+.kaffix-menu .menu-item-card:hover .item-image img,
+.kaffix-menu .menu-item:hover .item-image img {
+  transform: scale(1.06);
+}
+
+/* Overlay for CTA on hover */
+.kaffix-menu .menu-item-card .item-overlay,
+.kaffix-menu .menu-item .item-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+  opacity: 0;
+  transition: opacity 140ms ease-out;
+  pointer-events: none;
+}
+
+.kaffix-menu .menu-item-card:hover .item-overlay,
+.kaffix-menu .menu-item:hover .item-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- Scroll-triggered card entrance for MenuPage (IntersectionObserver in MenuPage.js) --- */
+.kaffix-menu .menu-item-card.animate-out {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.kaffix-menu .menu-item-card.animate-in {
+  animation: cardPop 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+/* Avoid double-animating the first two items that already use AOS */
+.kaffix-menu .menu-item-card[data-first-two="true"].animate-in {
+  animation: none;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@keyframes cardPop {
+  0%   { opacity: 0; transform: scale(0.98); }
+  70%  { opacity: 1; transform: scale(1.01); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Stability for smoother GPU rendering during pop */
+.kaffix-menu .menu-item-card {
+  backface-visibility: hidden;
+  transform-origin: center center;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .kaffix-menu .menu-item-card.animate-in,
+  .kaffix-menu .menu-item-card.animate-out {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Buttons */
+.primary-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.primary-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(32, 201, 151, 0.35); }
+
+.secondary-btn {
+  background: #e9ecef;
+  color: #343a40;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.secondary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+
+/* Add to cart button on cards */
+.add-cart-btn {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.add-cart-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(139, 69, 19, 0.3); }
+
+/* Ripple effect (CSS-only lightweight) */
+.ripple { position: relative; overflow: hidden; }
+.ripple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%);
+  transform: scale(0);
+  opacity: 0.75;
+  pointer-events: none;
+}
+.ripple:active::after { animation: ripple 500ms ease-out; }
+
+@keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+/* Modal and backdrop animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalIn { to { transform: translateY(0) scale(1); opacity: 1; } }
+
+/* Subtle tilt/lift on menu cards */
+.menu-item-card {
+  transform-style: preserve-3d;
+}
+.menu-item-card:hover {
+  transform: translateY(-6px) rotateX(1deg) rotateY(-1deg);
+}
+
+/* Responsive modal layout */
+@media (max-width: 768px) {
+  .modal-backdrop {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+  
+  .modal-card {
+    width: 100%;
+    margin: 1rem 0;
+    max-height: 95vh;
+  }
+  
+  .modal-content { 
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+    max-height: calc(95vh - 120px);
+  }
+  
+  .modal-image { 
+    height: 220px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .modal-actions {
+    width: 100%;
+  }
+  
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+/* Dark theme tweaks for modal */
+html[data-theme="dark"] .modal-card { background: var(--card); color: var(--text); }
+html[data-theme="dark"] .modal-close { background: rgba(255,255,255,0.06); }
+html[data-theme="dark"] .secondary-btn { background: #2a2f3a; color: #e7e7e7; }
+
+/* Menu Page: Strong, smooth card hover (override) */
+.kaffix-menu .menu-item-card,
+.kaffix-menu .menu-item {
+  position: relative;
+  transform: translateZ(0);
+  transition: transform 140ms cubic-bezier(.2,.8,.2,1), box-shadow 140ms cubic-bezier(.2,.8,.2,1);
+  will-change: transform, box-shadow;
+}
+
+/* Make menu cards flex columns so footer stays at bottom consistently */
+.kaffix-menu .menu-item-card,
+.kaffix-menu .menu-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.kaffix-menu .menu-item-card .item-content,
+.kaffix-menu .menu-item .item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.kaffix-menu .menu-item-card .item-footer,
+.kaffix-menu .menu-item .item-footer {
+  margin-top: auto;
+}
+
+.kaffix-menu .menu-item-card:hover,
+.kaffix-menu .menu-item:hover {
+  transform: translateY(-12px) scale(1.01) !important;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
+}
+
+.kaffix-menu .menu-item-card .item-image,
+.kaffix-menu .menu-item .item-image {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.kaffix-menu .menu-item-card .item-image img,
+.kaffix-menu .menu-item .item-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 160ms ease-out;
+}
+
+.kaffix-menu .menu-item-card:hover .item-image img,
+.kaffix-menu .menu-item:hover .item-image img {
+  transform: scale(1.06);
+}
+
+/* Overlay for CTA on hover */
+.kaffix-menu .menu-item-card .item-overlay,
+.kaffix-menu .menu-item .item-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+  opacity: 0;
+  transition: opacity 140ms ease-out;
+  pointer-events: none;
+}
+
+.kaffix-menu .menu-item-card:hover .item-overlay,
+.kaffix-menu .menu-item:hover .item-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 /* ---- MenuPage item footer alignment (price | Add to Cart | View Details) ---- */
 /* Keep this specific so other item-footers across the app remain unchanged */
@@ -4553,84 +5023,6 @@ html[data-theme="dark"] .popup-close:hover {
 .modal-section.nutrition .nutrition-item .value {
   font-variant-numeric: tabular-nums;
 }
-
-/* Buttons */
-.primary-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: #fff;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.primary-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(32, 201, 151, 0.35); }
-
-.secondary-btn {
-  background: #e9ecef;
-  color: #343a40;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.secondary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-
-/* Add to cart button on cards */
-.add-cart-btn {
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-.add-cart-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(139, 69, 19, 0.3); }
-
-/* Ripple effect (CSS-only lightweight) */
-.ripple { position: relative; overflow: hidden; }
-.ripple::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%);
-  transform: scale(0);
-  opacity: 0.75;
-  pointer-events: none;
-}
-.ripple:active::after { animation: ripple 500ms ease-out; }
-
-@keyframes ripple { to { transform: scale(4); opacity: 0; } }
-
-/* Modal and backdrop animations */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes modalIn { to { transform: translateY(0) scale(1); opacity: 1; } }
-
-/* Subtle tilt/lift on menu cards */
-.menu-item-card {
-  transform-style: preserve-3d;
-}
-.menu-item-card:hover {
-  transform: translateY(-6px) rotateX(1deg) rotateY(-1deg);
-}
-
-/* Responsive modal layout */
-@media (max-width: 768px) {
-  .modal-content { grid-template-columns: 1fr; }
-  .modal-image { height: 220px; }
-}
-
-/* Dark theme tweaks for modal */
-html[data-theme="dark"] .modal-card { background: var(--card); color: var(--text); }
-html[data-theme="dark"] .modal-close { background: rgba(255,255,255,0.06); }
-html[data-theme="dark"] .secondary-btn { background: #2a2f3a; color: #e7e7e7; }
 
 /* Menu Page: Strong, smooth card hover (override) */
 .kaffix-menu .menu-item-card,

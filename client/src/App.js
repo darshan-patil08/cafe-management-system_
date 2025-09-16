@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import CheckoutModal from './components/CheckoutModal';
+import './styles/CheckoutModal.css';
 import { CartContext, useCart } from './context/AppContext';
 import axios from 'axios';
 import './App.css';
@@ -20,7 +22,21 @@ const AppContext = createContext();
 
 // Cart Provider
 const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    // Load cart from localStorage on initial render
+    if (typeof window !== 'undefined') {
+      const savedCart = localStorage.getItem('cafeCart');
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    return [];
+  });
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cafeCart', JSON.stringify(cartItems));
+    }
+  }, [cartItems]);
 
   // Use a stable key for identity: prefer _id, then id; ignore undefined keys
   const getItemKey = (obj) => (obj && (obj._id ?? obj.id)) ?? null;
@@ -328,7 +344,7 @@ const CustomerLayout = () => {
     <div className="customer-layout">
 
       {/* Enhanced Navigation */}
-      <nav className={`modern-nav ${isScrolled ? 'scrolled' : ''}`}>
+      <nav className={`modern-nav ${isScrolled ? 'scrolled' : ''}`} style={{position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999}}>
         <div className="nav-container">
           <div className="nav-brand">
             <img src={SiteLogo} alt="CafeDeluxe" className="site-logo" />
@@ -411,8 +427,8 @@ const CustomerLayout = () => {
           </div>
           <div className="footer-section">
             <h4>Contact Info</h4>
-            <p>📍 123 Coffee Street, Brew City</p>
-            <p>📞 (555) 123-CAFE</p>
+            <p>📍 123 Coffee Street,Surat City, Gujraty</p>
+            <p>📞 (+91)9122013214</p>
             <p>📧 hello@cafedeluxe.com</p>
           </div>
         </div>
@@ -427,6 +443,20 @@ const CustomerLayout = () => {
 // Customer Components
 const CustomerCart = () => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const [showCheckout, setShowCheckout] = useState(false);
+  
+  const handleUpdateQuantity = (item, newQuantity) => {
+    if (newQuantity < 1) return;
+    updateQuantity(item, newQuantity);
+  };
+  
+  const handleProceedToCheckout = () => {
+    if (cartItems.length === 0) {
+      alert('Your cart is empty. Please add items before checkout.');
+      return;
+    }
+    setShowCheckout(true);
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -474,8 +504,21 @@ const CustomerCart = () => {
         <div className="total">
           <strong>Total: {formatINR(getCartTotal())}</strong>
         </div>
-        <button className="checkout-btn">Proceed to Checkout</button>
+        <button 
+          className="checkout-btn"
+          onClick={handleProceedToCheckout}
+          disabled={cartItems.length === 0}
+        >
+          Proceed to Checkout
+        </button>
       </div>
+      
+      <CheckoutModal
+        isOpen={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        cartItems={cartItems}
+        updateQuantity={handleUpdateQuantity}
+      />
     </div>
   );
 };
