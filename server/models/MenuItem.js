@@ -51,6 +51,10 @@ const menuItemSchema = new mongoose.Schema({
     type: String,
     enum: ['gluten', 'dairy', 'nuts', 'soy', 'eggs', 'shellfish', 'fish', 'sesame']
   }],
+  nutritionFacts: {
+    type: String,
+    trim: true
+  },
   nutritionalInfo: {
     calories: {
       type: Number,

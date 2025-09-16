@@ -643,6 +643,8 @@ html {
   color: white;
 }
 
+/* (removed) Inline availability badge overrides to restore overlay behavior */
+
 .item-details {
   padding: 25px;
 }
@@ -958,6 +960,43 @@ html {
   padding: 25px;
 }
 
+/* Keep category line distinct in user menu cards */
+.item-content .item-category {
+  display: initial; /* revert to default */
+  position: static;
+  margin-bottom: 0;
+}
+
+/* Ensure name + availability badge line up cleanly in user menu */
+.kaffix-menu .item-content h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.kaffix-menu .item-content .item-category {
+  /* Compact red badge */
+  display: inline-block;
+  background: #8B4513; /* Red background */
+  color: #fff;
+  padding: 1px 5px; /* Reduced padding */
+  border-radius: 7px; /* 7px as per requirement */
+  font-size: 10px; /* Slightly smaller font */
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  line-height: 1.8; /* Increased from 1.2 */
+  text-align: center;
+  min-width: 0;
+  max-width: fit-content; /* Tight fit to content */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.3px; /* Slight letter spacing for better readability */
+}
 .item-content h3 {
   color: #8B4513;
   margin-bottom: 10px;

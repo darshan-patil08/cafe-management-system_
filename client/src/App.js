@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { CartContext, useCart } from './context/AppContext';
 import axios from 'axios';
 import './App.css';
@@ -13,6 +13,7 @@ import SiteLogo from './ChatGPT Image Aug 21, 2025, 07_57_24 PM.png';
 import { formatINR } from './utils/currency';
 import ScrollToTop from './components/ScrollToTop';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { MenuProvider, useMenu } from './context/MenuContext';
 
 
 const AppContext = createContext();
@@ -362,7 +363,7 @@ const CustomerLayout = () => {
               className="nav-link cart-link"
               onClick={() => setCurrentView('customer-cart')}
             >
-              🛒 Cart ({getCartCount()})
+               Cart ({getCartCount()})
             </button>
           </div>
           
@@ -693,49 +694,10 @@ const AdminDashboard = () => {
 };
 
 const AdminMenuManagement = () => {
-  const [menuItems, setMenuItems] = useState([
-    {
-      _id: '1',
-      name: 'Espresso',
-      description: 'Rich, bold coffee shot with perfect crema',
-      price: 3.99,
-      category: 'coffee',
-      image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=400&q=80',
-      isAvailable: true
-    },
-    {
-      _id: '2',
-      name: 'Cappuccino',
-      description: 'Espresso with steamed milk and foam',
-      price: 4.49,
-      category: 'coffee',
-      image: 'https://images.unsplash.com/photo-1473923377535-0002805f57e8?q=80&w=1308&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      isAvailable: true
-    },
-    {
-      _id: '3',
-      name: 'Croissant',
-      description: 'Buttery, flaky French pastry',
-      price: 3.99,
-      category: 'pastry',
-      image: 'https://plus.unsplash.com/premium_photo-1670333242784-46b220ef90a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fENyb2lzc2FudHxlbnwwfHwwfHx8MA%3D%3D',
-      isAvailable: false
-    }
-  ]);
+  const { menuItems, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu();
+  const formRef = useRef(null);
 
-  // On mount, load saved admin items so seeds don't override persisted data
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('admin_menu_items');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          // Even if empty array, respect it (so deleted seeds don't reappear)
-          setMenuItems(parsed);
-        }
-      }
-    } catch {}
-  }, []);
+  // Using MenuContext for menu data; persistence handled by the provider
   
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -764,29 +726,7 @@ const AdminMenuManagement = () => {
     return Array.from(set).sort();
   }, [menuItems]);
 
-  // Load saved menu items from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('admin_menu_items');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          setMenuItems(parsed);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load menu items from localStorage', e);
-    }
-  }, []);
-
-  // Persist menu items to localStorage whenever they change
-  useEffect(() => {
-    try {
-      localStorage.setItem('admin_menu_items', JSON.stringify(menuItems));
-    } catch (e) {
-      console.error('Failed to save menu items to localStorage', e);
-    }
-  }, [menuItems]);
+  // Removed localStorage load/save; MenuContext persists and syncs
 
   const resetForm = () => {
     setFormData({
@@ -807,23 +747,13 @@ const AdminMenuManagement = () => {
     
     try {
       if (editingItem) {
-        // Update existing item
-        const updated = menuItems.map(item => 
-          item._id === editingItem._id ? { ...item, ...formData } : item
-        );
-        setMenuItems(updated);
-        try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
+        const id = editingItem.id || editingItem._id;
+        const updated = { ...editingItem, ...formData, id, price: parseFloat(formData.price) };
+        await updateMenuItem(updated);
         alert('✅ Menu item updated successfully!');
       } else {
-        // Add new item
-        const newItem = {
-          ...formData,
-          _id: Date.now().toString(),
-          price: parseFloat(formData.price)
-        };
-        const updated = [...menuItems, newItem];
-        setMenuItems(updated);
-        try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
+        const newItem = { ...formData, price: parseFloat(formData.price) };
+        await addMenuItem(newItem);
         alert('✅ Menu item added successfully!');
       }
       resetForm();
@@ -839,25 +769,28 @@ const AdminMenuManagement = () => {
     setFormData({ ...item, price: item.price.toString() });
     setEditingItem(item);
     setShowAddForm(true);
+    // Smoothly scroll to the edit form
+    setTimeout(() => {
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   };
 
   const handleDelete = (id) => {
     if (!window.confirm('⚠ Are you sure you want to delete this item?')) return;
     
-    const updated = menuItems.filter(item => item._id !== id);
-    setMenuItems(updated);
-    try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
+    const targetId = id;
+    deleteMenuItem(targetId);
     alert('✅ Menu item deleted successfully!');
   };
 
   const toggleAvailability = (id) => {
-    const updated = menuItems.map(item => 
-      item._id === id ? { ...item, isAvailable: !item.isAvailable } : item
-    );
-    setMenuItems(updated);
-    try { localStorage.setItem('admin_menu_items', JSON.stringify(updated)); } catch {}
+    const current = (menuItems || []).find(it => (it.id || it._id) === id);
+    if (!current) return;
+    const updated = { ...current, id: current.id || current._id, isAvailable: !current.isAvailable };
+    updateMenuItem(updated);
   };
-
   const filteredItems = menuItems.filter(item => {
     const matchesCategory = filters.category === 'all' || item.category === filters.category;
     const matchesAvailability = filters.availability === 'all' || 
@@ -926,7 +859,7 @@ const AdminMenuManagement = () => {
 
       {/* Add/Edit Form */}
       {showAddForm && (
-        <div className="add-form-container">
+        <div className="add-form-container" ref={formRef}>
           <h3>{editingItem ? '✏ Edit Menu Item' : '➕ Add New Menu Item'}</h3>
           <form onSubmit={handleSubmit} className="menu-form">
             <div className="form-row">
@@ -957,7 +890,7 @@ const AdminMenuManagement = () => {
                 </datalist>
               </div>
               <div className="form-group">
-                <label>💰 Price ($) *</label>
+                <label>💰 Price (₹) *</label>
                 <input
                   type="number"
                   step="0.01"
@@ -1042,7 +975,7 @@ const AdminMenuManagement = () => {
                 
                 <div className="item-meta">
                   <div className="meta-row">
-                    <span className="price">${item.price.toFixed(2)}</span>
+                    <span className="price">{formatINR(Number(item.price))}</span>
                     <span className={`category ${item.category}`}>
                       {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
                     </span>
@@ -1057,14 +990,14 @@ const AdminMenuManagement = () => {
                     ✏ Edit
                   </button>
                   <button 
-                    className={`availability-btn ${item.isAvailable ? 'disable' : 'enable'}`}
-                    onClick={() => toggleAvailability(item._id)}
+                    className={`availability-btn ${item.isAvailable ? 'set-unavailable' : 'set-available'}`}
+                    onClick={() => toggleAvailability(item._id || item.id)}
                   >
-                    {item.isAvailable ? '🚫 Disable' : '✅ Enable'}
+                    {item.isAvailable ? 'Unavailable' : 'Available'}
                   </button>
                   <button 
                     className="delete-btn"
-                    onClick={() => handleDelete(item._id)}
+                    onClick={() => handleDelete(item._id || item.id)}
                   >
                     🗑 Delete
                   </button>
@@ -1480,7 +1413,15 @@ function App() {
 
   // Always start at top on view change
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    const id = setTimeout(() => {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      } catch (e) {
+        // Fallback for older browsers
+        window.scrollTo(0, 0);
+      }
+    }, 50); // A small delay to ensure the view is rendered
+    return () => clearTimeout(id);
   }, [currentView]);
 
   const logout = () => {
@@ -1517,19 +1458,24 @@ function App() {
 
   return (
     <AppContext.Provider value={{ user, setUser, currentView, setCurrentView, logout, theme, toggleTheme }}>
-      <CartProvider>
-        <div className="App">
-          {currentView === 'auth' && <AuthView />}
-          {user && user.role === 'admin' && <AdminLayout />}
-          {user && user.role === 'user' && <CustomerLayout />}
-          <Popup 
-            message={popup.message}
-            type={popup.type}
-            isVisible={popup.show}
-            onClose={() => setPopup({...popup, show: false})}
-          />
-        </div>
-      </CartProvider>
+      <MenuProvider>
+        <CartProvider>
+          <Router>
+            <ScrollToTop />
+            <div className="App" data-aos="fade-in">
+              {currentView === 'auth' && <AuthView />}
+              {user && user.role === 'admin' && <AdminLayout />}
+              {user && user.role === 'user' && <CustomerLayout />}
+              <Popup 
+                message={popup.message}
+                type={popup.type}
+                isVisible={popup.show}
+                onClose={() => setPopup({...popup, show: false})}
+              />
+            </div>
+          </Router>
+        </CartProvider>
+      </MenuProvider>
     </AppContext.Provider>
   );
 }

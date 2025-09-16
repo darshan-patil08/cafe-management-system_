@@ -1,103 +1,184 @@
 // client/src/pages/admin/MenuManagement.js
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import axios from 'axios';
-import { Container, Card, Button, FormGroup, Label, Input } from '../../components/styled/StyledComponents';
+import { useMenu } from '../../context/MenuContext';
+import { formatINR } from '../../utils/currency';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  padding: 2rem;
+`;
+
+const AdminHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+`;
+
+const Button = styled.button`
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  
+  &.primary {
+    background-color: #007bff;
+  }
+`;
+
+const Input = styled.input`
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 1rem;
+`;
+
+const Card = styled.div`
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 1rem;
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+`;
 
 const MenuManagement = () => {
-  const [menuItems, setMenuItems] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [formData, setFormData] = useState({
+  const { menuItems, addMenuItem, updateMenuItem, deleteMenuItem, loading, error } = useMenu();
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [formState, setFormState] = useState({
+    id: null,
     name: '',
     description: '',
     price: '',
     category: 'coffee',
-    image: '',
-    ingredients: []
+    nutritionFacts: ''
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    fetchMenuItems();
-  }, []);
-
-  const fetchMenuItems = async () => {
-    try {
-      const response = await axios.get('/api/menu');
-      setMenuItems(response.data);
-    } catch (error) {
-      console.error('Error fetching menu items:', error);
+    let items = menuItems;
+    if (searchTerm) {
+      items = items.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
+    if (categoryFilter !== 'all') {
+      items = items.filter(item => item.category === categoryFilter);
+    }
+    setFilteredItems(items);
+  }, [searchTerm, categoryFilter, menuItems]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormState(prevState => ({ ...prevState, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const itemData = { ...formState, price: parseFloat(formState.price) };
+
     try {
-      if (editingItem) {
-        await axios.put(`/api/menu/${editingItem._id}`, formData);
+      if (isEditing) {
+        await updateMenuItem(itemData);
       } else {
-        await axios.post('/api/menu', formData);
+        await addMenuItem(itemData);
       }
-      
-      fetchMenuItems();
       resetForm();
-    } catch (error) {
-      console.error('Error saving menu item:', error);
+    } catch (err) {
+      console.error("Failed to save menu item", err);
     }
   };
 
+  // Edit existing item
+  const handleEdit = (item) => {
+    setFormState({
+      ...item,
+      id: item.id,
+      price: item.price
+    });
+    setIsEditing(true);
+    setShowForm(true);
+  };
+  
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
-        await axios.delete(`/api/menu/${id}`);
-        fetchMenuItems();
-      } catch (error) {
-        console.error('Error deleting menu item:', error);
+        await deleteMenuItem(id);
+      } catch (err) {
+        console.error("Failed to delete menu item", err);
       }
     }
   };
 
   const resetForm = () => {
-    setFormData({
+    setFormState({
+      id: null,
       name: '',
       description: '',
       price: '',
       category: 'coffee',
-      image: '',
-      ingredients: []
+      nutritionFacts: ''
     });
-    setEditingItem(null);
+    setIsEditing(false);
     setShowForm(false);
   };
 
-  const startEdit = (item) => {
-    setFormData(item);
-    setEditingItem(item);
-    setShowForm(true);
-  };
-
   return (
-    <Container data-aos="fade-in" data-aos-duration="600">
-      <div className="admin-header" data-aos="fade-up">
+    <Container>
+      <AdminHeader>
         <h2>Menu Management</h2>
         <Button 
-          variant="primary" 
+          className="primary" 
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? 'Cancel' : 'Add New Item'}
         </Button>
+      </AdminHeader>
+
+      <div className="filters">
+        <Input
+          type="text"
+          placeholder="Search by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+          <option value="all">All Categories</option>
+          <option value="coffee">Coffee</option>
+          <option value="tea">Tea</option>
+          <option value="pastry">Pastry</option>
+          <option value="sandwich">Sandwich</option>
+          <option value="salad">Salad</option>
+          <option value="dessert">Dessert</option>
+        </select>
       </div>
 
       {showForm && (
-        <Card className="dashboard-card" data-aos="zoom-in" data-aos-delay="100">
-          <h3>{editingItem ? 'Edit Item' : 'Add New Item'}</h3>
+        <Card>
+          <h3>{isEditing ? 'Edit Item' : 'Add New Item'}</h3>
           <form onSubmit={handleSubmit}>
             <FormGroup>
               <Label>Name</Label>
               <Input
                 type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                name="name"
+                value={formState.name}
+                onChange={handleInputChange}
                 required
               />
             </FormGroup>
@@ -106,8 +187,9 @@ const MenuManagement = () => {
               <Label>Description</Label>
               <Input
                 type="text"
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                name="description"
+                value={formState.description}
+                onChange={handleInputChange}
                 required
               />
             </FormGroup>
@@ -116,9 +198,10 @@ const MenuManagement = () => {
               <Label>Price</Label>
               <Input
                 type="number"
+                name="price"
                 step="0.01"
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: e.target.value})}
+                value={formState.price}
+                onChange={handleInputChange}
                 required
               />
             </FormGroup>
@@ -126,8 +209,9 @@ const MenuManagement = () => {
             <FormGroup>
               <Label>Category</Label>
               <select
-                value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value})}
+                name="category"
+                value={formState.category}
+                onChange={handleInputChange}
                 required
               >
                 <option value="coffee">Coffee</option>
@@ -139,26 +223,36 @@ const MenuManagement = () => {
               </select>
             </FormGroup>
 
-            <Button type="submit" variant="primary">
-              {editingItem ? 'Update Item' : 'Add Item'}
+            <FormGroup>
+              <Label>Nutrition Facts</Label>
+              <Input
+                type="text"
+                name="nutritionFacts"
+                value={formState.nutritionFacts}
+                onChange={handleInputChange}
+              />
+            </FormGroup>
+
+            <Button type="submit" className="primary">
+              {isEditing ? 'Update Item' : 'Add Item'}
             </Button>
           </form>
         </Card>
       )}
 
-      <div className="menu-items-list" data-aos="fade-up" data-aos-delay="150">
-        {menuItems.map((item, idx) => (
-          <Card key={item._id} className="dashboard-card" data-aos="zoom-in" data-aos-delay={(idx % 6) * 75}>
+      <div className="menu-items-list">
+        {filteredItems.map(item => (
+          <Card key={item.id}>
             <div className="item-row">
               <div className="item-info">
                 <h4>{item.name}</h4>
                 <p>{item.description}</p>
-                <span className="price">${item.price.toFixed(2)}</span>
+                <span className="price">{formatINR(Number(item.price))}</span>
                 <span className="category">{item.category}</span>
               </div>
               <div className="item-actions">
-                <Button onClick={() => startEdit(item)}>Edit</Button>
-                <Button onClick={() => handleDelete(item._id)}>Delete</Button>
+                <Button onClick={() => handleEdit(item)}>Edit</Button>
+                <Button onClick={() => handleDelete(item.id)}>Delete</Button>
               </div>
             </div>
           </Card>

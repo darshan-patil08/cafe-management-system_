@@ -1,5 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { AppContext } from '../App';
+import { useMenu } from '../context/MenuContext';
+import { formatINR } from '../utils/currency';
 
 const HomePage = () => {
   const { setCurrentView, user } = useContext(AppContext);
@@ -21,6 +23,9 @@ const HomePage = () => {
       message: ''
     });
   };
+
+  const { menuItems } = useMenu();
+  const featuredItems = useMemo(() => (menuItems || []).filter(i => i.isAvailable !== false).slice(0, 8), [menuItems]);
 
   return (
     <div className="homepage">
@@ -141,55 +146,19 @@ const HomePage = () => {
             <p>Discover our signature beverages and artisanal treats</p>
           </div>
           <div className="menu-grid">
-            {[
-              {
-                name: "Iced Coffee",
-                price: "$3.50",
-                image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=1200&q=80"
-              },
-              {
-                name: "Hot Latte",
-                price: "4.00", 
-                image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1200&q=80"
-              },
-              {
-                name: "Milk Shake",
-                price: "$5.00",
-                image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=1200&q=80"
-              },
-              {
-                name: "Cappucino",
-                price: "$4.50",
-                image: "https://images.unsplash.com/photo-1558618047-fd816ddef6cd?auto=format&fit=crop&w=1200&q=80"
-              },
-              {
-                name: "Americano",
-                price: "$3.00",
-                image: "https://images.unsplash.com/photo-1497636577773-f1231844b336?auto=format&fit=crop&w=1200&q=80"
-              },
-              {
-                name: "Espresso",
-                price: "$2.50",
-                image: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=1200&q=80"
-              },
-              {
-                name: "Mocha Latte",
-                price: "$4.80",
-                image: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1200&q=80"
-              },
-              {
-                name: "Black Coffee",
-                price: "$3.00",
-                image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&w=1200&q=80"
-              }
-            ].map((item, index) => (
-              <div key={index} className="menu-item">
+            {featuredItems.map((item, index) => (
+              <div key={item.id || item._id || index} className="menu-item">
                 <div className="menu-item-image">
                   <img src={item.image} alt={item.name} />
                 </div>
                 <div className="menu-item-content">
                   <h4>{item.name}</h4>
-                  <span className="menu-price">{item.price}</span>
+                  <span className="menu-price">{formatINR(Number(item.price))}</span>
+                  {item.nutritionFacts && (
+                    <div className="menu-nutrition-label" title="Nutrition Facts">
+                      {item.nutritionFacts}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

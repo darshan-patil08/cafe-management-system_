@@ -93,15 +93,21 @@ router.get('/:id', authenticate, requireAdmin, async (req, res) => {
 // Admin: Create menu item
 router.post('/', authenticate, requireAdmin, async (req, res) => {
   try {
-    const menuItemData = req.body;
+    const { name, description, price, category, nutritionFacts } = req.body;
     
     // Validate required fields
-    if (!menuItemData.name || !menuItemData.description || !menuItemData.price || !menuItemData.category) {
+    if (!name || !description || !price || !category) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     
     // Create menu item
-    const menuItem = new MenuItem(menuItemData);
+    const menuItem = new MenuItem({
+      name,
+      description,
+      price,
+      category,
+      nutritionFacts
+    });
     await menuItem.save();
     
     res.status(201).json({ 
@@ -125,9 +131,10 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
 // Admin: Update menu item
 router.put('/:id', authenticate, requireAdmin, async (req, res) => {
   try {
+    const { nutritionFacts } = req.body;
     const menuItem = await MenuItem.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { ...req.body, nutritionFacts },
       { new: true, runValidators: true }
     );
     
