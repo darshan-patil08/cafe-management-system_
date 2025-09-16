@@ -196,7 +196,6 @@ html {
 }
 
 .main-header {
-  position: sticky;
   top: 0;
   z-index: 100;
   background: rgba(255, 255, 255, 0.5);
@@ -225,7 +224,7 @@ html {
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 8px;
 }
 
 .logo h1 {
@@ -279,24 +278,39 @@ html {
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: #8B4513;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #7a3c11;
   padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .logout-btn {
+  background: rgba(139, 69, 19, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #7a3c11;
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .logout-btn:hover {
+  background: #8B4513;
 }
 
 /* Navigation Styles */
 .admin-nav,
 .customer-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background: var(--nav-bg);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -1561,9 +1575,21 @@ html[data-theme="dark"] .menu-item .item-content p {
   color: var(--muted);
 }
 /* Price contrast in dark for Menu cards */
-html[data-theme="dark"] .menu-item-card .item-footer .item-price,
-html[data-theme="dark"] .menu-item .item-footer .item-price {
-  color: #8ef0b0; /* lighter success green for dark bg */
+/* Light mode price color (black) */
+.item-price,
+.kaffix-menu .menu-item-card .item-footer .item-price,
+.kaffix-menu .menu-item .item-footer .item-price {
+  color: #000000; /* Black for light mode */
+}
+
+/* Dark mode price color (green) */
+[data-theme="dark"] .item-price,
+[data-theme="dark"] .menu-item-card .item-footer .item-price,
+[data-theme="dark"] .menu-item .item-footer .item-price,
+[data-theme="dark"] .kaffix-menu .menu-item-card .item-footer .item-price,
+[data-theme="dark"] .kaffix-menu .menu-item .item-footer .item-price {
+  color: #4CAF50; /* Green for dark mode */
+  font-weight: 600;
 }
 
 /* Additional dark theme overrides for sections with hardcoded light backgrounds */
@@ -2165,7 +2191,7 @@ html[data-theme="dark"] .cta-btn.secondary {
 .item-price {
   font-size: 1.3rem;
   font-weight: 800;
-  color: #8B4513;
+  color: #000000; /* Black for light mode */
 }
 
 .add-cart-btn {
@@ -3419,7 +3445,7 @@ html[data-theme="dark"] .cta-btn.secondary {
 .item-price {
   font-size: 1.3rem;
   font-weight: 800;
-  color: #8B4513;
+  color: #000000; /* Black for light mode */
 }
 
 .add-cart-btn {
@@ -3726,21 +3752,31 @@ html[data-theme="dark"] .cta-btn.secondary {
 }
 
 .nav-user .logout-btn {
-  background: transparent;
-  border: 2px solid #8B4513;
-  color: #8B4513;
-  padding: 8px 16px;
+  background: #8B4513;
+  border: 2px solid #7a3c11;
+  color: white;
+  padding: 6px 14px;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .nav-user .logout-btn {
+  background: rgba(139, 69, 19, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-user .logout-btn:hover {
-  background: #8B4513;
+  background: #7a3c11;
   color: white;
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .nav-user .logout-btn:hover {
+  background: #8B4513;
 }
 
 /* Page Content Margin */
@@ -4940,7 +4976,7 @@ html[data-theme="dark"] .secondary-btn { background: #2a2f3a; color: #e7e7e7; }
 .kaffix-menu .menu-item-card .item-footer .item-price,
 .kaffix-menu .menu-item .item-footer .item-price {
   font-weight: 800;
-  color: #8B4513;
+  color: #000000; /* Black for light mode */
 }
 
 .kaffix-menu .menu-item-card .item-footer .add-cart-btn,

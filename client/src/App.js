@@ -4,6 +4,7 @@ import './styles/CheckoutModal.css';
 import { CartContext, useCart } from './context/AppContext';
 import axios from 'axios';
 import './App.css';
+import './styles/AdminDashboard.css';
 import HomePage from './components/HomePage';
 import MenuPage from './components/MenuPage';
 import AboutPage from './components/AboutPage';
@@ -627,7 +628,7 @@ const CustomerProfile = () => {
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     todayOrders: 12,
-    totalRevenue: 1247.50,
+    totalRevenue: 1280000, // Storing in paise for accurate calculations
     pendingOrders: 3,
     completedOrders: 9,
     totalMenuItems: 25,
@@ -654,7 +655,7 @@ const AdminDashboard = () => {
           <div className="stat-icon">💰</div>
           <div className="stat-info">
             <h3>Total Revenue</h3>
-            <p className="stat-number">${stats.totalRevenue.toFixed(2)}</p>
+            <p className="stat-number">{formatINR(stats.totalRevenue / 100)}</p>
           </div>
         </div>
         
@@ -1062,10 +1063,10 @@ const AdminOrderManagement = () => {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       items: [
-        { name: 'Cappuccino', quantity: 2, price: 4.49 },
-        { name: 'Croissant', quantity: 1, price: 3.99 }
+        { name: 'Cappuccino', quantity: 2, price: 15000 },
+        { name: 'Croissant', quantity: 1, price: 20000 }
       ],
-      total: 12.97,
+      total: 50000,
       status: 'pending',
       orderDate: '2025-08-17T10:30:00Z',
       estimatedTime: 15
@@ -1075,10 +1076,10 @@ const AdminOrderManagement = () => {
       customerName: 'Jane Smith',
       customerEmail: 'jane@example.com',
       items: [
-        { name: 'Latte', quantity: 1, price: 4.99 },
-        { name: 'Muffin', quantity: 2, price: 3.49 }
+        { name: 'Latte', quantity: 1, price: 28900 },
+        { name: 'Muffin', quantity: 2, price: 10800 }
       ],
-      total: 11.97,
+      total: 50500,
       status: 'preparing',
       orderDate: '2025-08-17T11:00:00Z',
       estimatedTime: 10
@@ -1088,9 +1089,9 @@ const AdminOrderManagement = () => {
       customerName: 'Mike Johnson',
       customerEmail: 'mike@example.com',
       items: [
-        { name: 'Americano', quantity: 1, price: 3.49 }
+        { name: 'Americano', quantity: 1, price: 21500 }
       ],
-      total: 3.49,
+      total: 21500,
       status: 'ready',
       orderDate: '2025-08-17T11:15:00Z',
       estimatedTime: 0
@@ -1197,7 +1198,7 @@ const AdminOrderManagement = () => {
                     <div key={index} className="order-item">
                       <span>{item.name}</span>
                       <span>Qty: {item.quantity}</span>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span>{formatINR((item.price * item.quantity) / 100)}</span>
                     </div>
                   ))}
                 </div>
@@ -1205,7 +1206,7 @@ const AdminOrderManagement = () => {
 
               <div className="order-footer">
                 <div className="order-total">
-                  <strong>💰 Total: ${order.total.toFixed(2)}</strong>
+                  <strong>💰 Total: {formatINR(order.total / 100)}</strong>
                   {order.estimatedTime > 0 && (
                     <span className="estimated-time">⏱ Est: {order.estimatedTime} mins</span>
                   )}

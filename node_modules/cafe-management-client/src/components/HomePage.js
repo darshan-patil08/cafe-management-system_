@@ -330,14 +330,14 @@ const HomePage = () => {
                 <div className="info-icon">📍</div>
                 <div>
                   <h3>Address</h3>
-                  <p>123 Coffee Street, Brew City, BC 12345</p>
+                  <p>123 Coffee Street,Surat City, Gujrat</p>
                 </div>
               </div>
               <div className="info-item">
                 <div className="info-icon">📞</div>
                 <div>
                   <h3>Phone</h3>
-                  <p>(555) 123-CAFE</p>
+                  <p>(+91)9122013214</p>
                 </div>
               </div>
               <div className="info-item">

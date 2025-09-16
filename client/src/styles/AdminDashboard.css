@@ -1,0 +1,458 @@
+/* Admin Dashboard */
+.admin-dashboard {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: var(--text);
+}
+
+.recent-activity {
+  margin-top: 3rem;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.recent-activity h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.activity-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.activity-icon {
+  font-size: 1.25rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: rgba(139, 69, 19, 0.1);
+  color: #8B4513;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-content p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.activity-content p strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.activity-time {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+/* Dark mode specific styles */
+[data-theme="dark"] .activity-item {
+  background: var(--card);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .activity-content p,
+[data-theme="dark"] .activity-content p strong {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .activity-time {
+  color: #a0a0a0;
+}
+
+[data-theme="dark"] .activity-icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+[data-theme="dark"] .recent-activity h3 {
+  color: #f0f0f0;
+}
+
+/* Order Management Styles */
+.order-management {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: var(--text);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-header h2 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.section-header p {
+  color: var(--muted);
+  margin: 0.5rem 0 0 0;
+}
+
+.order-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.stat-badge.preparing {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.stat-badge.ready {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.filter-controls {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--card);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.filter-controls label {
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.filter-controls select {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.order-info h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text);
+  font-size: 1.3rem;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.customer-info p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.order-status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.order-items {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.order-items h4 {
+  margin: 0 0 1rem 0;
+  color: var(--text);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.95rem;
+  gap: 1rem;
+}
+
+.order-item span {
+  white-space: nowrap;
+}
+
+.order-item span:first-child {
+  flex: 1;
+  font-weight: 500;
+}
+
+.order-footer {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+}
+
+[data-theme="dark"] .order-footer {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.order-total {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.estimated-time {
+  font-size: 0.9rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--border);
+}
+
+.order-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-btn.preparing {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.status-btn.ready {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-btn.completed {
+  background-color: #6c757d;
+  color: white;
+}
+
+.status-btn.cancelled {
+  background-color: #dc3545;
+  color: white;
+}
+
+.status-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.empty-state h3 {
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Dark mode specific styles for order management */
+[data-theme="dark"] .order-card,
+[data-theme="dark"] .filter-controls {
+  background: var(--card);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .order-header {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .order-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .filter-controls select {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .stat-badge.pending {
+  background-color: #332701;
+  color: #ffd43b;
+}
+
+[data-theme="dark"] .stat-badge.preparing {
+  background-color: #0b4b5a;
+  color: #66d9e8;
+}
+
+[data-theme="dark"] .stat-badge.ready {
+  background-color: #0a3622;
+  color: #63e6be;
+}
+
+[data-theme="dark"] .status-btn {
+  color: white;
+}
+
+[data-theme="dark"] .status-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .empty-state {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .empty-state h3 {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .empty-state p {
+  color: #a0a0a0;
+}

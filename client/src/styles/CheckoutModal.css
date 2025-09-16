@@ -14,7 +14,7 @@
 .dark-mode {
   --primary-color: #D4A76A;
   --primary-hover: #E6B98A;
-  --text-color: #f5f5f5;
+  --text-color: #31af3c;
   --text-light: #d1d1d1;
   --bg-color: #2d2d2d;
   --bg-secondary: #3a3a3a;
@@ -282,9 +282,7 @@
 .item-price {
   font-weight: 600;
   color: #8B4513;
-  margin-left: 20px;
   min-width: 80px;
-  text-align: right;
 }
 
 .price-summary {
